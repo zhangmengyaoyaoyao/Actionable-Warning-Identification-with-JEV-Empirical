@@ -1,0 +1,8 @@
+openai
+pandas
+openpyxl
+numpy
+python-dotenv
+dashscope
+ollama
+typesafe-sdk

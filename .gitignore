@@ -1,0 +1,26 @@
+.vscode/
+.venv/
+.env
+**/__pycache__/
+test/
+
+# Large raw/report datasets
+report/c_json/
+report/c_raw/
+report/spotbugs/
+report/spotbugs_linked/
+
+# LLM experiment outputs (do not upload)
+results/
+*.xlsx
+*.xls
+*.csv
+
+# Ignore all response/* by default (LLM providers, etc.)
+response/*
+
+# Allow only JEV / TypeSafe System One results to be committed
+!response/jev*/
+!response/jev*/**
+!response/Jev*/
+!response/Jev*/**
