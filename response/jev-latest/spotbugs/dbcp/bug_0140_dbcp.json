@@ -1,0 +1,58 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0140_dbcp.json",
+  "warning": {
+    "category": "MALICIOUS_CODE",
+    "vtype": "EI_EXPOSE_REP",
+    "priority": "2",
+    "rank": "18",
+    "project": "dbcp",
+    "warning_line": "return columnIndexes;\n",
+    "warning_method": "public int[] getColumnIndexes() {\nreturn columnIndexes;\n}"
+  },
+  "created_at": "2026-10-16T12:40:25.491377+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"category\": \"MALICIOUS_CODE\",\n  \"vtype\": \"EI_EXPOSE_REP\",\n  \"priority\": \"2\",\n  \"rank\": \"18\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"return columnIndexes;\\n\",\n  \"warning_method\": \"public int[] getColumnIndexes() {\\nreturn columnIndexes;\\n}\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 497,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.51,
+        "probabilities": {
+          "actionable": 0.67,
+          "unactionable": 0.28,
+          "unknown": 0.05
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.51,
+    "probabilities": {
+      "actionable": 0.67,
+      "unactionable": 0.28,
+      "unknown": 0.05
+    }
+  }
+}

@@ -1,118 +1,95 @@
-# 1 项目说明
-## 1.1 目录结构
-文件夹       | 说明
------------ | -----
-prompts  | 存放提示词
-report  | 原始数据。spotbugs_linked是完整的警告（包含手工标记结果），spotbugs/是最终的json格式Java项目警告；c_json/是json格式C/C++项目警告。
-response  | LLMs返回的回答，子文件夹名称代表“LLM/prompt_technique/project_name”
-src  | 核心代码
-src/llm  | 从不同平台调用不同LLMs
-test  | 临时测试，暂时没有用处
+# Actionable Warning Identification with JEV
 
-## 1.2 核心代码
-文件       | 说明
------------ | -----
-src/cli.py  | 统一命令入口（run / jev / toexcel / result / analysis）
-src/pipeline.py  | 处理警告 JSON、调用 LLM、写入 response/
-src/jev/  | JEV (TypeSafe System One) Choice 模式：调用、落盘完整结果
-src/jev/questions.py  | Choice 问题定义（actionable / unactionable / unknown）
-src/jev/client.py  | TypeSafeClient 封装
-src/jev/pipeline.py  | 扫描警告 JSON、调用 JEV、写入 response/
-src/config.py  | 模型平台、项目列表、提示词技术等配置
-src/construct_prompts.py  | 根据采用的提示词技术合成提示词
-src/postprocess.py  | 将 LLM 回答转 excel 并链接人工标记
-src/find_function.py  | 目前采用提取C函数的代码
-src/toexcel_and_comp.py  | 后处理入口（默认 Java）
-src/response2excel.py  | 将LLM的回答存储到excel中
-src/get_result.py  | 根据 excel 统计指标
-src/judge_consistent.py  | 判断LLM的结论与手工标记结果的一致性
-report/csv2json_java.py  | 将Java项目警告转换为json格式
-report/csv2json_c.py  | 将C/C++项目警告转为json格式
+用 JEV（TypeSafe System One）的 Choice 模式判断静态分析警告是否可处理。每条警告三选一：`actionable`、`unactionable`、`unknown`。完整调用结果先落成 JSON，再导出 Excel，并对照人工标记写出 `groundtruth` 与 `comparison`。
 
-# 2 如何上手（调用LLM分类警告）
-## 2.1 获取API-KEY
-### 2.1.1 Llama3.1-70B-Instruct
-阿里云百炼：https://bailian.console.aliyun.com/#/model-market
+以下命令都在项目根目录、已激活虚拟环境后执行。
 
-NVIDIA(推荐-速度快，免费token多):https://build.nvidia.com/meta/llama-3_1-70b-instruct
+# 1 目录与代码
 
-OpenRouter: https://openrouter.ai/meta-llama/llama-3.1-70b-instruct:free
+| 路径 | 说明 |
+| --- | --- |
+| `report/spotbugs/<project>/` | Java 警告 JSON。文件名 `bug_0001_dbcp.json` 对应人工标记 CSV 的第 1 行 |
+| `report/spotbugs_linked/` | Java 人工标记，`<project>_linked.csv` 的 `final_label` 为 `TP` 或 `FP` |
+| `report/c_json/` | C/C++ 警告 JSON |
+| `report/c_raw/c.xlsx` | C/C++ 人工标记。导出 C 结果的 Excel 时需要此文件 |
+| `response/<model>/spotbugs/<project>/` | Java 的 JEV 结果，每条警告一个 JSON |
+| `response/<model>/C_project/` | C/C++ 的 JEV 结果 |
+| `results/jev/` | 导出的 Excel |
+| `src/cli.py` | 命令入口：`jev`、`jev-excel` |
+| `src/jev/questions.py` | Choice 的 `instructions` 与 `criteria` |
+| `src/jev/client.py` | TypeSafe 客户端 |
+| `src/jev/pipeline.py` | 扫描警告 JSON、调用 JEV、写入 `response/` |
+| `src/jev/export.py` | 把已有结果导出为 Excel，并计算 `comparison` |
+| `.env` | `TYPESAFE_API_KEY`。可从 `.env.example` 复制 |
 
-### 2.1.2 GLM
-BigModel: https://bigmodel.cn/pricing
+Java 项目及警告条数：
 
-将 key 写入 `.env`（可复制 `.env.example`），或设置对应环境变量。不要把 key 写进源码。
+| 项目 | 条数 | 项目 | 条数 |
+| --- | ---: | --- | ---: |
+| dbcp | 165 | fileupload | 568 |
+| bcel | 625 | collections | 645 |
+| digester | 650 | codec | 665 |
+| net | 718 | mavendp | 918 |
+| pool | 2281 | configuration | 2905 |
 
-```
-AIHUBMIX_API_KEY=...
-NVIDIA_API_KEY=...
-GLM_API_KEY=...
-OPENROUTER_API_KEY=...
-DASHSCOPE_API_KEY=...
-LLM_API_KEY=...
-TYPESAFE_API_KEY=...   # JEV / TypeSafe
-```
+C/C++ 警告在 `report/c_json/`，共 1904 条。小批量验证用 **dbcp**。
 
-## 2.2 运行 LLM
-在项目根目录执行。`--provider` 可选：`gpt` / `glm` / `nvidia` / `openrouter` / `aihubmix` / `deepseek` / `aliyun` / `ollama`。
+人工标记：`TP` 表示警告真实可处理，`FP` 表示静态分析误报。
 
-```
-python -m src.cli run --provider nvidia --lang java --projects codec --techniques zero_shot
-python -m src.cli run --provider gpt --lang java --projects all --techniques all
-python -m src.cli run --provider deepseek --lang c --techniques critique
-```
+# 2 准备环境
 
-也可继续用各平台入口（需同样带上 `--lang` 等参数）：
+已有虚拟环境 `.venv`（Python 3.12）。在 PowerShell 中：
 
-```
-python -m src.llm.chat_gpt --lang java --projects digester --techniques zero_shot
-python -m src.llm.chat_llama_nvidia --lang java --projects codec --techniques all
-```
-
-## 2.3 运行 JEV（Choice 模式）
-使用 TypeSafe System One / JEV，对每条警告做三选一分类：`actionable` / `unactionable` / `unknown`。  
-当前只负责调用与完整结果落盘，不做 excel / 指标后处理。
-
-安装依赖：
-
-```
+```powershell
+cd "F:\STUDY\ise\Agent based AWI\Actionable Warning Identification with JEV-Empirical"
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-设置 key（或写入 `.env`）：
+若激活脚本被执行策略拦住，先在当前窗口执行：
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+依赖为 `python-dotenv`、`typesafe-sdk`、`pandas`、`openpyxl`。
+
+# 3 配置 API key
+
+把 `.env.example` 复制为 `.env`，填写：
 
 ```
-# PowerShell
+TYPESAFE_API_KEY=你的key
+```
+
+程序启动时会读取 `.env`。也可以只在当前窗口设置：
+
+```powershell
 $env:TYPESAFE_API_KEY="你的key"
 ```
 
-运行示例：
+# 4 调用 JEV
 
-```
-# 单个 Java 项目，先跑前 2 条验证通路
-python -m src.cli jev --lang java --projects bcel --start 0 --end 2
+Choice 定义在 `src/jev/questions.py`。默认模型名 `jev-latest`，写入 `response/jev-latest/`。`--end` 不含终点，`--start 0 --end 10` 是排序后的前 10 条。
 
-# 全部 Java 项目
-python -m src.cli jev --lang java --projects all
+## 4.1 小批量验证（dbcp，前 10 条）
 
-# C/C++ 警告
-python -m src.cli jev --lang c
-
-# 指定模型名、断点续跑
-python -m src.cli jev --lang java --projects codec --model jev-latest --skip-existing
-
-# 等价入口
-python -m src.jev --lang java --projects bcel --end 1
+```powershell
+python -m src.cli jev --lang java --projects dbcp --start 0 --end 10
 ```
 
-结果写入（每条警告一个完整 JSON，含 request + response + choice/probabilities/confidence/usage）：
+等价入口：
 
-```
-response/<model>/spotbugs/<project>/<bug_xxxx>.json   # Java
-response/<model>/C_project/<bug_xxxx>.json            # C
+```powershell
+python -m src.jev --lang java --projects dbcp --start 0 --end 10
 ```
 
-单条结果结构示意：
+结果：`response/jev-latest/spotbugs/dbcp/bug_0001_dbcp.json` 起，每条一个 JSON，内含 request、response、`choice`、`confidence`、`probabilities`。
+
+## 4.2 跑完 dbcp
+
+已有 JSON 会跳过：
 
 ```json
 {
@@ -160,86 +137,77 @@ response/<model>/C_project/<bug_xxxx>.json            # C
 }
 ```
 
-可在 `src/jev/questions.py` 中修改 Choice 的 `instructions` / `criteria`。
+## 4.3 跑其他 Java 项目或全部项目
 
-## 2.4 数据后处理（LLM 结果）
-将 txt 回复转为 excel，并导入手工标记：
-
-```
-python -m src.cli toexcel --lang java
-python -m src.cli toexcel --lang c
+```powershell
+python -m src.cli jev --lang java --projects bcel codec --skip-existing
+python -m src.cli jev --lang java --projects all --skip-existing
 ```
 
-兼容旧入口（默认 Java）：
+可选项目：`bcel`、`codec`、`collections`、`configuration`、`dbcp`、`digester`、`fileupload`、`mavendp`、`net`、`pool`。
 
-```
-python -m src.toexcel_and_comp
-```
+指定模型名（同时决定输出目录 `response/<model>/`）：
 
-根据 final_label 和 status 统计指标：
-
-```
-python -m src.cli result --lang java
-python -m src.cli result --lang c --by-tool --by-category
+```powershell
+python -m src.cli jev --lang java --projects dbcp --model jev-latest --skip-existing
 ```
 
-兼容旧入口（默认 C，且按 tool+category 分组）：
+## 4.4 跑 C/C++
+
+先验证前 10 条，再续跑全部：
+
+```powershell
+python -m src.cli jev --lang c --start 0 --end 10
+python -m src.cli jev --lang c --skip-existing
+```
+
+结果目录：`response/jev-latest/C_project/`。
+
+# 5 导出 Excel
+
+读取已经落盘的 JSON，按文件名序号对齐人工标记。`bug_0004_dbcp.json` 对 `dbcp_linked.csv` 的第 4 行，不使用 CSV 里的 `no` 列。只导出 `response/` 中已有的结果。
+
+dbcp：
+
+```powershell
+python -m src.cli jev-excel --lang java --projects dbcp
+```
+
+全部已跑过的 Java 项目：
+
+```powershell
+python -m src.cli jev-excel --lang java --projects all
+```
+
+C/C++（需要 `report/c_raw/c.xlsx`）：
+
+```powershell
+python -m src.cli jev-excel --lang c
+```
+
+默认输出：
 
 ```
-python -m src.get_result
+results/jev/java_jev-latest.xlsx
+results/jev/c_jev-latest.xlsx
 ```
 
-# 3 实验方法
+指定路径：
 
-## 3.1 数据集处理
-### 3.1.1 Java
-#### 预处理-格式转换
-report/link.py: 在报告中加入rank和priority
+```powershell
+python -m src.cli jev-excel --lang java --projects dbcp --output results/jev/dbcp.xlsx
+```
 
-report/csv2json_java.py: 转换为json格式
+每条警告一行。主要列：`file_name`、`project`、`category`、`vtype`、`choice`、`confidence`、三项概率、`groundtruth`、`comparison`。
 
-转换后的数据
+`comparison` 的对照规则：
 
-csv格式：report/spotbugs_report
+| choice | groundtruth | comparison |
+| --- | --- | --- |
+| actionable | TP | TP |
+| unactionable | FP | TN |
+| actionable | FP | FP |
+| unactionable | TP | FN |
+| unknown | TP 或 FP | unknown |
 
-json格式：report/spotbugs_json
-
-例子：
-
-``` json
-{
-    "category": "MALICIOUS_CODE",
-    "vtype": "MS_PKGPROTECT",
-    "priority": "2",
-    "rank": "18",
-    "project": "bcel",
-    "warning_line": "@Deprecated\npublic static final String[] SHORT_TYPE_NAMES = { ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, \"Z\", \"C\", \"F\", \"D\", \"B\", \"S\", \"I\", \"J\", \"V\", ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE };",
-    "warning_method": "@Deprecated\npublic static final String[] SHORT_TYPE_NAMES = { ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, \"Z\", \"C\", \"F\", \"D\", \"B\", \"S\", \"I\", \"J\", \"V\", ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE };"
-}
-``` 
-
-### 3.1.2 C/C++
-#### 提取函数上下文
-因为原警告所在函数提取结果存在错误，我们重新提取警告所在函数作为警告上下文。同时，为了控制token数量，我们规定若函数长度超过100行，以警告上下100行代码作为警告上下文。
-
-具体方法见：
-https://github.com/zhangmengyaoyaoyao/Extract-Function-Snippet-From-C-Projects
-
-#### 预处理-格式转换
-report/csv2json_c.py: 转换为json格式
-
-### 后处理
-提取结果
-
-部分例子手动处理
-
-
-
-# 结果分析
-将txt回复转换为excel，并将手工标记导入：`python3 -m src.toexcel_and_comp`
-
-toexcel_and_comp中critique情况：发现gpt有很多回答是"No changes needed"，因此碰到这种情况时尝试从第二次、第一次的回答中寻找答案。
-
-根据final_label（groundtruth）和status，统计各个指标的结果。`python3 -m src.get_result`
-
-有一些status还是error，会有"potentially actionable" "Investigate the potential null pointer dereference and ensure `dev` is not null before use"之类的回答。这种情况全部归为unknown。
+C/C++ 人工标记里的 `True` 视作可处理，`False` 视作误报，对照规则相同。

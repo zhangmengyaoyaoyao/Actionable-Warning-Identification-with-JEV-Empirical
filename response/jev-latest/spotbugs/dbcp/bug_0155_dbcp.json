@@ -1,0 +1,58 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0155_dbcp.json",
+  "warning": {
+    "category": "Multithreaded correctness",
+    "vtype": "IS2_INCONSISTENT_SYNC",
+    "priority": "3",
+    "rank": "20",
+    "project": "dbcp",
+    "warning_line": "private UserPassKey userPassKey;",
+    "warning_method": "private UserPassKey userPassKey;"
+  },
+  "created_at": "2026-10-16T12:40:29.682999+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"category\": \"Multithreaded correctness\",\n  \"vtype\": \"IS2_INCONSISTENT_SYNC\",\n  \"priority\": \"3\",\n  \"rank\": \"20\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"private UserPassKey userPassKey;\",\n  \"warning_method\": \"private UserPassKey userPassKey;\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 484,
+      "output_tokens": 46
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unknown",
+        "confidence": 0.33,
+        "probabilities": {
+          "actionable": 0.21,
+          "unactionable": 0.24,
+          "unknown": 0.55
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unknown",
+    "confidence": 0.33,
+    "probabilities": {
+      "actionable": 0.21,
+      "unactionable": 0.24,
+      "unknown": 0.55
+    }
+  }
+}

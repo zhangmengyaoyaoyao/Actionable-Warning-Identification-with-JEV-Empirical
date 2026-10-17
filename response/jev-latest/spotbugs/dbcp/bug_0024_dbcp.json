@@ -1,0 +1,58 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0024_dbcp.json",
+  "warning": {
+    "category": "DODGY_CODE",
+    "vtype": "REC_CATCH_EXCEPTION",
+    "priority": "3",
+    "rank": "20",
+    "project": "dbcp",
+    "warning_line": "} catch (final Exception t) {\n",
+    "warning_method": "static Driver createDriver(final BasicDataSource basicDataSource) throws SQLException {\nDriver driverToUse = basicDataSource.getDriver();\nfinal String driverClassName = basicDataSource.getDriverClassName();\nfinal ClassLoader driverClassLoader = basicDataSource.getDriverClassLoader();\nfinal String url = basicDataSource.getUrl();\nif (driverToUse == null) {\nClass<?> driverFromCCL = null;\nif (driverClassName != null) {\ntry {\ntry {\nif (driverClassLoader == null) {\ndriverFromCCL = Class.forName(driverClassName);\n} else {\ndriverFromCCL = Class.forName(driverClassName, true, driverClassLoader);\n}\n} catch (final ClassNotFoundException cnfe) {\ndriverFromCCL = Thread.currentThread().getContextClassLoader().loadClass(driverClassName);\n}\n} catch (final Exception t) {\nfinal String message = \"Cannot load JDBC driver class '\" + driverClassName + \"'\";\nbasicDataSource.log(message, t);\nthrow new SQLException(message, t);\n}\n}\ntry {\nif (driverFromCCL == null) {\ndriverToUse = DriverManager.getDriver(url);\n} else {\ndriverToUse = (Driver) driverFromCCL.getConstructor().newInstance();\nif (!driverToUse.acceptsURL(url)) {\nthrow new SQLException(\"No suitable driver\", \"08001\");\n}\n}\n} catch (final Exception t) {\nfinal String message = \"Cannot create JDBC driver of class '\" + (driverClassName != null ? driverClassName : \"\") + \"' for connect URL '\" + url + \"'\";\nbasicDataSource.log(message, t);\nthrow new SQLException(message, t);\n}\n}\nreturn driverToUse;\n}"
+  },
+  "created_at": "2026-10-16T12:39:53.078159+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"category\": \"DODGY_CODE\",\n  \"vtype\": \"REC_CATCH_EXCEPTION\",\n  \"priority\": \"3\",\n  \"rank\": \"20\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"} catch (final Exception t) {\\n\",\n  \"warning_method\": \"static Driver createDriver(final BasicDataSource basicDataSource) throws SQLException {\\nDriver driverToUse = basicDataSource.getDriver();\\nfinal String driverClassName = basicDataSource.getDriverClassName();\\nfinal ClassLoader driverClassLoader = basicDataSource.getDriverClassLoader();\\nfinal String url = basicDataSource.getUrl();\\nif (driverToUse == null) {\\nClass<?> driverFromCCL = null;\\nif (driverClassName != null) {\\ntry {\\ntry {\\nif (driverClassLoader == null) {\\ndriverFromCCL = Class.forName(driverClassName);\\n} else {\\ndriverFromCCL = Class.forName(driverClassName, true, driverClassLoader);\\n}\\n} catch (final ClassNotFoundException cnfe) {\\ndriverFromCCL = Thread.currentThread().getContextClassLoader().loadClass(driverClassName);\\n}\\n} catch (final Exception t) {\\nfinal String message = \\\"Cannot load JDBC driver class '\\\" + driverClassName + \\\"'\\\";\\nbasicDataSource.log(message, t);\\nthrow new SQLException(message, t);\\n}\\n}\\ntry {\\nif (driverFromCCL == null) {\\ndriverToUse = DriverManager.getDriver(url);\\n} else {\\ndriverToUse = (Driver) driverFromCCL.getConstructor().newInstance();\\nif (!driverToUse.acceptsURL(url)) {\\nthrow new SQLException(\\\"No suitable driver\\\", \\\"08001\\\");\\n}\\n}\\n} catch (final Exception t) {\\nfinal String message = \\\"Cannot create JDBC driver of class '\\\" + (driverClassName != null ? driverClassName : \\\"\\\") + \\\"' for connect URL '\\\" + url + \\\"'\\\";\\nbasicDataSource.log(message, t);\\nthrow new SQLException(message, t);\\n}\\n}\\nreturn driverToUse;\\n}\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 975,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.52,
+        "probabilities": {
+          "actionable": 0.3,
+          "unactionable": 0.68,
+          "unknown": 0.02
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.52,
+    "probabilities": {
+      "actionable": 0.3,
+      "unactionable": 0.68,
+      "unknown": 0.02
+    }
+  }
+}

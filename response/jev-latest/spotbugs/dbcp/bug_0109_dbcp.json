@@ -1,0 +1,58 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0109_dbcp.json",
+  "warning": {
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "dbcp",
+    "warning_line": "} catch (final Exception ignored) {\n",
+    "warning_method": "public static void closeQuietly(final AutoCloseable autoCloseable) {\nif (autoCloseable != null) {\ntry {\nautoCloseable.close();\n} catch (final Exception ignored) {\n}\n}\n}"
+  },
+  "created_at": "2026-10-16T12:40:16.800315+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"category\": \"BAD_PRACTICE\",\n  \"vtype\": \"DE_MIGHT_IGNORE\",\n  \"priority\": \"3\",\n  \"rank\": \"19\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"} catch (final Exception ignored) {\\n\",\n  \"warning_method\": \"public static void closeQuietly(final AutoCloseable autoCloseable) {\\nif (autoCloseable != null) {\\ntry {\\nautoCloseable.close();\\n} catch (final Exception ignored) {\\n}\\n}\\n}\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 529,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.73,
+        "probabilities": {
+          "actionable": 0.17,
+          "unactionable": 0.82,
+          "unknown": 0.01
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.73,
+    "probabilities": {
+      "actionable": 0.17,
+      "unactionable": 0.82,
+      "unknown": 0.01
+    }
+  }
+}

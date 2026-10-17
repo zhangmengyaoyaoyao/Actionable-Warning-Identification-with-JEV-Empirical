@@ -1,0 +1,58 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0086_dbcp.json",
+  "warning": {
+    "category": "DODGY_CODE",
+    "vtype": "NP_LOAD_OF_KNOWN_NULL_VALUE",
+    "priority": "3",
+    "rank": "19",
+    "project": "dbcp",
+    "warning_line": "closeDueToException(info);\n",
+    "warning_method": "@Override\npublic Connection getConnection(final String userName, final String userPassword) throws SQLException {\nif (instanceKey == null) {\nthrow new SQLException(\"Must set the ConnectionPoolDataSource \" + \"through setDataSourceName or setConnectionPoolDataSource\" + \" before calling getConnection.\");\n}\ngetConnectionCalled = true;\nPooledConnectionAndInfo info = null;\ntry {\ninfo = getPooledConnectionAndInfo(userName, userPassword);\n} catch (final RuntimeException | SQLException e) {\ncloseDueToException(info);\nthrow e;\n} catch (final Exception e) {\ncloseDueToException(info);\nthrow new SQLException(\"Cannot borrow connection from pool\", e);\n}\nif (!(null == userPassword ? null == info.getPassword() : userPassword.equals(info.getPassword()))) {\ntry {\ntestCPDS(userName, userPassword);\n} catch (final SQLException ex) {\ncloseDueToException(info);\nthrow new SQLException(\"Given password did not match password used\" + \" to create the PooledConnection.\", ex);\n} catch (final javax.naming.NamingException ne) {\nthrow new SQLException(\"NamingException encountered connecting to database\", ne);\n}\nfinal UserPassKey upkey = info.getUserPassKey();\nfinal PooledConnectionManager manager = getConnectionManager(upkey);\nmanager.invalidate(info.getPooledConnection());\nmanager.setPassword(upkey.getPassword());\ninfo = null;\nfor (int i = 0; i < 10; i++) {\ntry {\ninfo = getPooledConnectionAndInfo(userName, userPassword);\n} catch (final RuntimeException | SQLException e) {\ncloseDueToException(info);\nthrow e;\n} catch (final Exception e) {\ncloseDueToException(info);\nthrow new SQLException(\"Cannot borrow connection from pool\", e);\n}\nif (info != null && userPassword != null && userPassword.equals(info.getPassword())) {\nbreak;\n}\nif (info != null) {\nmanager.invalidate(info.getPooledConnection());\n}\ninfo = null;\n}\nif (info == null) {\nthrow new SQLException(\"Cannot borrow connection from pool - password change failure.\");\n}\n}\nfinal Connection connection = info.getPooledConnection().getConnection();\ntry {\nsetupDefaults(connection, userName);\nconnection.clearWarnings();\nreturn connection;\n} catch (final SQLException ex) {\nUtils.close(connection, e -> getLogWriter().println(\"ignoring exception during close: \" + e));\nthrow ex;\n}\n}"
+  },
+  "created_at": "2026-10-16T12:40:09.831199+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"category\": \"DODGY_CODE\",\n  \"vtype\": \"NP_LOAD_OF_KNOWN_NULL_VALUE\",\n  \"priority\": \"3\",\n  \"rank\": \"19\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"closeDueToException(info);\\n\",\n  \"warning_method\": \"@Override\\npublic Connection getConnection(final String userName, final String userPassword) throws SQLException {\\nif (instanceKey == null) {\\nthrow new SQLException(\\\"Must set the ConnectionPoolDataSource \\\" + \\\"through setDataSourceName or setConnectionPoolDataSource\\\" + \\\" before calling getConnection.\\\");\\n}\\ngetConnectionCalled = true;\\nPooledConnectionAndInfo info = null;\\ntry {\\ninfo = getPooledConnectionAndInfo(userName, userPassword);\\n} catch (final RuntimeException | SQLException e) {\\ncloseDueToException(info);\\nthrow e;\\n} catch (final Exception e) {\\ncloseDueToException(info);\\nthrow new SQLException(\\\"Cannot borrow connection from pool\\\", e);\\n}\\nif (!(null == userPassword ? null == info.getPassword() : userPassword.equals(info.getPassword()))) {\\ntry {\\ntestCPDS(userName, userPassword);\\n} catch (final SQLException ex) {\\ncloseDueToException(info);\\nthrow new SQLException(\\\"Given password did not match password used\\\" + \\\" to create the PooledConnection.\\\", ex);\\n} catch (final javax.naming.NamingException ne) {\\nthrow new SQLException(\\\"NamingException encountered connecting to database\\\", ne);\\n}\\nfinal UserPassKey upkey = info.getUserPassKey();\\nfinal PooledConnectionManager manager = getConnectionManager(upkey);\\nmanager.invalidate(info.getPooledConnection());\\nmanager.setPassword(upkey.getPassword());\\ninfo = null;\\nfor (int i = 0; i < 10; i++) {\\ntry {\\ninfo = getPooledConnectionAndInfo(userName, userPassword);\\n} catch (final RuntimeException | SQLException e) {\\ncloseDueToException(info);\\nthrow e;\\n} catch (final Exception e) {\\ncloseDueToException(info);\\nthrow new SQLException(\\\"Cannot borrow connection from pool\\\", e);\\n}\\nif (info != null && userPassword != null && userPassword.equals(info.getPassword())) {\\nbreak;\\n}\\nif (info != null) {\\nmanager.invalidate(info.getPooledConnection());\\n}\\ninfo = null;\\n}\\nif (info == null) {\\nthrow new SQLException(\\\"Cannot borrow connection from pool - password change failure.\\\");\\n}\\n}\\nfinal Connection connection = info.getPooledConnection().getConnection();\\ntry {\\nsetupDefaults(connection, userName);\\nconnection.clearWarnings();\\nreturn connection;\\n} catch (final SQLException ex) {\\nUtils.close(connection, e -> getLogWriter().println(\\\"ignoring exception during close: \\\" + e));\\nthrow ex;\\n}\\n}\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 1144,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.25,
+        "probabilities": {
+          "actionable": 0.5,
+          "unactionable": 0.48,
+          "unknown": 0.02
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.25,
+    "probabilities": {
+      "actionable": 0.5,
+      "unactionable": 0.48,
+      "unknown": 0.02
+    }
+  }
+}

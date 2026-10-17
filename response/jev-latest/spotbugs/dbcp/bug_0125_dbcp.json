@@ -1,0 +1,58 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0125_dbcp.json",
+  "warning": {
+    "category": "PERFORMANCE",
+    "vtype": "WMI_WRONG_MAP_ITERATOR",
+    "priority": "2",
+    "rank": "18",
+    "project": "dbcp",
+    "warning_line": "stringBuilder.append(NUPROP_WARNTEXT.get(propertyName)).append(\" You have set value of \\\"\")\n",
+    "warning_method": "private void validatePropertyNames(final Reference ref, final Name name, final List<String> warnings, final List<String> infoMessages) {\nfinal List<String> allPropsAsList = Arrays.asList(ALL_PROPERTIES);\nfinal String nameString = name != null ? \"Name = \" + name.toString() + \" \" : \"\";\nif (NUPROP_WARNTEXT != null && !NUPROP_WARNTEXT.isEmpty()) {\nfor (final String propertyName : NUPROP_WARNTEXT.keySet()) {\nfinal RefAddr ra = ref.get(propertyName);\nif (ra != null && !allPropsAsList.contains(ra.getType())) {\nfinal StringBuilder stringBuilder = new StringBuilder(nameString);\nfinal String propertyValue = ra.getContent().toString();\nstringBuilder.append(NUPROP_WARNTEXT.get(propertyName)).append(\" You have set value of \\\"\").append(propertyValue).append(\"\\\" for \\\"\").append(propertyName).append(\"\\\" property, which is being ignored.\");\nwarnings.add(stringBuilder.toString());\n}\n}\n}\nfinal Enumeration<RefAddr> allRefAddrs = ref.getAll();\nwhile (allRefAddrs.hasMoreElements()) {\nfinal RefAddr ra = allRefAddrs.nextElement();\nfinal String propertyName = ra.getType();\nif (!(allPropsAsList.contains(propertyName) || NUPROP_WARNTEXT.containsKey(propertyName) || SILENT_PROPERTIES.contains(propertyName))) {\nfinal String propertyValue = ra.getContent().toString();\nfinal StringBuilder stringBuilder = new StringBuilder(nameString);\nstringBuilder.append(\"Ignoring unknown property: \").append(\"value of \\\"\").append(propertyValue).append(\"\\\" for \\\"\").append(propertyName).append(\"\\\" property\");\ninfoMessages.add(stringBuilder.toString());\n}\n}\n}"
+  },
+  "created_at": "2026-10-16T12:40:21.049358+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"category\": \"PERFORMANCE\",\n  \"vtype\": \"WMI_WRONG_MAP_ITERATOR\",\n  \"priority\": \"2\",\n  \"rank\": \"18\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"stringBuilder.append(NUPROP_WARNTEXT.get(propertyName)).append(\\\" You have set value of \\\\\\\"\\\")\\n\",\n  \"warning_method\": \"private void validatePropertyNames(final Reference ref, final Name name, final List<String> warnings, final List<String> infoMessages) {\\nfinal List<String> allPropsAsList = Arrays.asList(ALL_PROPERTIES);\\nfinal String nameString = name != null ? \\\"Name = \\\" + name.toString() + \\\" \\\" : \\\"\\\";\\nif (NUPROP_WARNTEXT != null && !NUPROP_WARNTEXT.isEmpty()) {\\nfor (final String propertyName : NUPROP_WARNTEXT.keySet()) {\\nfinal RefAddr ra = ref.get(propertyName);\\nif (ra != null && !allPropsAsList.contains(ra.getType())) {\\nfinal StringBuilder stringBuilder = new StringBuilder(nameString);\\nfinal String propertyValue = ra.getContent().toString();\\nstringBuilder.append(NUPROP_WARNTEXT.get(propertyName)).append(\\\" You have set value of \\\\\\\"\\\").append(propertyValue).append(\\\"\\\\\\\" for \\\\\\\"\\\").append(propertyName).append(\\\"\\\\\\\" property, which is being ignored.\\\");\\nwarnings.add(stringBuilder.toString());\\n}\\n}\\n}\\nfinal Enumeration<RefAddr> allRefAddrs = ref.getAll();\\nwhile (allRefAddrs.hasMoreElements()) {\\nfinal RefAddr ra = allRefAddrs.nextElement();\\nfinal String propertyName = ra.getType();\\nif (!(allPropsAsList.contains(propertyName) || NUPROP_WARNTEXT.containsKey(propertyName) || SILENT_PROPERTIES.contains(propertyName))) {\\nfinal String propertyValue = ra.getContent().toString();\\nfinal StringBuilder stringBuilder = new StringBuilder(nameString);\\nstringBuilder.append(\\\"Ignoring unknown property: \\\").append(\\\"value of \\\\\\\"\\\").append(propertyValue).append(\\\"\\\\\\\" for \\\\\\\"\\\").append(propertyName).append(\\\"\\\\\\\" property\\\");\\ninfoMessages.add(stringBuilder.toString());\\n}\\n}\\n}\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 986,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.33,
+        "probabilities": {
+          "actionable": 0.42,
+          "unactionable": 0.55,
+          "unknown": 0.03
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.33,
+    "probabilities": {
+      "actionable": 0.42,
+      "unactionable": 0.55,
+      "unknown": 0.03
+    }
+  }
+}

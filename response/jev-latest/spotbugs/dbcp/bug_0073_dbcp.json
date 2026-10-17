@@ -1,0 +1,58 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0073_dbcp.json",
+  "warning": {
+    "category": "MALICIOUS_CODE",
+    "vtype": "MS_MUTABLE_COLLECTION_PKGPROTECT",
+    "priority": "2",
+    "rank": "18",
+    "project": "dbcp",
+    "warning_line": "protected static final HashMap<String, ObjectPool<? extends Connection>> pools = new HashMap<>();",
+    "warning_method": "protected static final HashMap<String, ObjectPool<? extends Connection>> pools = new HashMap<>();"
+  },
+  "created_at": "2026-10-16T12:40:06.254819+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"category\": \"MALICIOUS_CODE\",\n  \"vtype\": \"MS_MUTABLE_COLLECTION_PKGPROTECT\",\n  \"priority\": \"2\",\n  \"rank\": \"18\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"protected static final HashMap<String, ObjectPool<? extends Connection>> pools = new HashMap<>();\",\n  \"warning_method\": \"protected static final HashMap<String, ObjectPool<? extends Connection>> pools = new HashMap<>();\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 517,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.58,
+        "probabilities": {
+          "actionable": 0.24,
+          "unactionable": 0.72,
+          "unknown": 0.04
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.58,
+    "probabilities": {
+      "actionable": 0.24,
+      "unactionable": 0.72,
+      "unknown": 0.04
+    }
+  }
+}

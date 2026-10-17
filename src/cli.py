@@ -8,10 +8,6 @@ from src.config import (
     get_api_key,
     resolve_list,
 )
-from src.get_result import get_result
-from src.llm.clients import build_client
-from src.pipeline import run_experiments
-from src.postprocess import export_responses_to_excel
 
 
 def _add_common_experiment_args(parser):
@@ -70,6 +66,16 @@ def build_parser():
     jev.add_argument("--end", type=int, default=None, help="JSON 文件切片终点（不含）")
     jev.add_argument("--skip-existing", action="store_true", help="已有结果 json 则跳过")
 
+    jev_excel = sub.add_parser(
+        "jev-excel",
+        help="将已有 JEV 结果导出为 excel，并对照人工标记写入 groundtruth 与 TP/TN/FP/FN",
+    )
+    jev_excel.add_argument("--lang", choices=["java", "c"], required=True)
+    jev_excel.add_argument("--projects", nargs="+", default=["all"], help="Java 项目名，或 all")
+    jev_excel.add_argument("--tool", default="spotbugs")
+    jev_excel.add_argument("--model", default="jev-latest")
+    jev_excel.add_argument("--output", default=None, help="输出 xlsx 路径，默认 results/jev/<lang>_<model>.xlsx")
+
     toexcel = sub.add_parser("toexcel", help="将 response/ 中的 txt 转为 excel，并链接人工标记")
     _add_common_experiment_args(toexcel)
 
@@ -99,6 +105,9 @@ def build_parser():
 
 
 def cmd_run(args):
+    from src.llm.clients import build_client
+    from src.pipeline import run_experiments
+
     spec = PROVIDERS[args.provider]
     model = args.model or spec["model"]
     model_fullname = args.model_fullname or spec["model_fullname"]
@@ -142,7 +151,22 @@ def cmd_jev(args):
         )
 
 
+def cmd_jev_excel(args):
+    from src.jev.export import export_jev_results
+
+    projects = None if args.lang == "c" else resolve_list(args.projects, JAVA_PROJECTS)
+    export_jev_results(
+        model=args.model,
+        lang=args.lang,
+        projects=projects,
+        tool=args.tool,
+        output_excel=args.output,
+    )
+
+
 def cmd_toexcel(args):
+    from src.postprocess import export_responses_to_excel
+
     models = resolve_list(args.models, RESULT_MODELS) if args.models else list(RESULT_MODELS)
     projects = resolve_list(args.projects, JAVA_PROJECTS)
     techniques = resolve_list(args.techniques, PROMPT_TECHNIQUES)
@@ -156,6 +180,8 @@ def cmd_toexcel(args):
 
 
 def cmd_result(args):
+    from src.get_result import get_result
+
     models = resolve_list(args.models, RESULT_MODELS) if args.models else list(RESULT_MODELS)
     projects = resolve_list(args.projects, JAVA_PROJECTS)
     techniques = resolve_list(args.techniques, PROMPT_TECHNIQUES)
@@ -197,6 +223,7 @@ def main(argv=None):
     commands = {
         "run": cmd_run,
         "jev": cmd_jev,
+        "jev-excel": cmd_jev_excel,
         "toexcel": cmd_toexcel,
         "result": cmd_result,
         "analysis": cmd_analysis,
@@ -213,6 +240,7 @@ def run_cli(default_provider):
     subcommands = {
         "run",
         "jev",
+        "jev-excel",
         "toexcel",
         "result",
         "analysis",

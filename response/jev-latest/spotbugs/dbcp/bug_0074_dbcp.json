@@ -1,0 +1,58 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0074_dbcp.json",
+  "warning": {
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "dbcp",
+    "warning_line": "} catch (final Exception ignored) {\n",
+    "warning_method": "public void invalidateConnection(final Connection conn) throws SQLException {\nif (!(conn instanceof PoolGuardConnectionWrapper)) {\nthrow new SQLException(\"Invalid connection class\");\n}\nfinal PoolGuardConnectionWrapper pgconn = (PoolGuardConnectionWrapper) conn;\n@SuppressWarnings(\"unchecked\")\nfinal ObjectPool<Connection> pool = (ObjectPool<Connection>) pgconn.pool;\ntry {\npool.invalidateObject(pgconn.getDelegateInternal());\n} catch (final Exception ignored) {\n}\n}"
+  },
+  "created_at": "2026-10-16T12:40:06.498480+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"category\": \"BAD_PRACTICE\",\n  \"vtype\": \"DE_MIGHT_IGNORE\",\n  \"priority\": \"3\",\n  \"rank\": \"19\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"} catch (final Exception ignored) {\\n\",\n  \"warning_method\": \"public void invalidateConnection(final Connection conn) throws SQLException {\\nif (!(conn instanceof PoolGuardConnectionWrapper)) {\\nthrow new SQLException(\\\"Invalid connection class\\\");\\n}\\nfinal PoolGuardConnectionWrapper pgconn = (PoolGuardConnectionWrapper) conn;\\n@SuppressWarnings(\\\"unchecked\\\")\\nfinal ObjectPool<Connection> pool = (ObjectPool<Connection>) pgconn.pool;\\ntry {\\npool.invalidateObject(pgconn.getDelegateInternal());\\n} catch (final Exception ignored) {\\n}\\n}\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 620,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.49,
+        "probabilities": {
+          "actionable": 0.66,
+          "unactionable": 0.32,
+          "unknown": 0.02
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.49,
+    "probabilities": {
+      "actionable": 0.66,
+      "unactionable": 0.32,
+      "unknown": 0.02
+    }
+  }
+}

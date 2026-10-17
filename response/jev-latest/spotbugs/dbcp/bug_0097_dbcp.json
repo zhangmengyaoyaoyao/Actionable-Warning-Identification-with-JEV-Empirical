@@ -1,0 +1,58 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0097_dbcp.json",
+  "warning": {
+    "category": "CORRECTNESS",
+    "vtype": "EC_ARRAY_AND_NONARRAY",
+    "priority": "1",
+    "rank": "1",
+    "project": "dbcp",
+    "warning_line": "if (userName == null || !userName.equals(this.userName)) {\n",
+    "warning_method": "@Override\npublic void closePool(final String userName) throws SQLException {\nsynchronized (this) {\nif (userName == null || !userName.equals(this.userName)) {\nreturn;\n}\n}\ntry {\npool.close();\n} catch (final Exception ex) {\nthrow new SQLException(\"Error closing connection pool\", ex);\n}\n}"
+  },
+  "created_at": "2026-10-16T12:40:13.053160+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"category\": \"CORRECTNESS\",\n  \"vtype\": \"EC_ARRAY_AND_NONARRAY\",\n  \"priority\": \"1\",\n  \"rank\": \"1\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"if (userName == null || !userName.equals(this.userName)) {\\n\",\n  \"warning_method\": \"@Override\\npublic void closePool(final String userName) throws SQLException {\\nsynchronized (this) {\\nif (userName == null || !userName.equals(this.userName)) {\\nreturn;\\n}\\n}\\ntry {\\npool.close();\\n} catch (final Exception ex) {\\nthrow new SQLException(\\\"Error closing connection pool\\\", ex);\\n}\\n}\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 564,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.48,
+        "probabilities": {
+          "actionable": 0.31,
+          "unactionable": 0.65,
+          "unknown": 0.04
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.48,
+    "probabilities": {
+      "actionable": 0.31,
+      "unactionable": 0.65,
+      "unknown": 0.04
+    }
+  }
+}

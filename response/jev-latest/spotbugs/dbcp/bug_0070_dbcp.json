@@ -1,0 +1,58 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0070_dbcp.json",
+  "warning": {
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "dbcp",
+    "warning_line": "} catch (final Exception ignored) {\n",
+    "warning_method": "@Override\npublic synchronized void close() throws SQLException {\nif (isClosedInternal()) {\nreturn;\n}\nboolean isUnderlyingConnectionClosed;\ntry {\nisUnderlyingConnectionClosed = getDelegateInternal().isClosed();\n} catch (final SQLException e) {\ntry {\npool.invalidateObject(this);\n} catch (final IllegalStateException ise) {\npassivate();\ngetInnermostDelegate().close();\n} catch (final Exception ignored) {\n}\nthrow new SQLException(\"Cannot close connection (isClosed check failed)\", e);\n}\nif (isUnderlyingConnectionClosed) {\n// Abnormal close: underlying connection closed unexpectedly, so we\ntry {\npool.invalidateObject(this);\n} catch (final IllegalStateException e) {\npassivate();\ngetInnermostDelegate().close();\n} catch (final Exception e) {\nthrow new SQLException(\"Cannot close connection (invalidating pooled object failed)\", e);\n}\n} else {\n// Normal close: underlying connection is still open, so we\ntry {\npool.returnObject(this);\n} catch (final IllegalStateException e) {\npassivate();\ngetInnermostDelegate().close();\n} catch (final SQLException | RuntimeException e) {\nthrow e;\n} catch (final Exception e) {\nthrow new SQLException(\"Cannot close connection (return to pool failed)\", e);\n}\n}\n}"
+  },
+  "created_at": "2026-10-16T12:40:05.515014+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"category\": \"BAD_PRACTICE\",\n  \"vtype\": \"DE_MIGHT_IGNORE\",\n  \"priority\": \"3\",\n  \"rank\": \"19\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"} catch (final Exception ignored) {\\n\",\n  \"warning_method\": \"@Override\\npublic synchronized void close() throws SQLException {\\nif (isClosedInternal()) {\\nreturn;\\n}\\nboolean isUnderlyingConnectionClosed;\\ntry {\\nisUnderlyingConnectionClosed = getDelegateInternal().isClosed();\\n} catch (final SQLException e) {\\ntry {\\npool.invalidateObject(this);\\n} catch (final IllegalStateException ise) {\\npassivate();\\ngetInnermostDelegate().close();\\n} catch (final Exception ignored) {\\n}\\nthrow new SQLException(\\\"Cannot close connection (isClosed check failed)\\\", e);\\n}\\nif (isUnderlyingConnectionClosed) {\\n// Abnormal close: underlying connection closed unexpectedly, so we\\ntry {\\npool.invalidateObject(this);\\n} catch (final IllegalStateException e) {\\npassivate();\\ngetInnermostDelegate().close();\\n} catch (final Exception e) {\\nthrow new SQLException(\\\"Cannot close connection (invalidating pooled object failed)\\\", e);\\n}\\n} else {\\n// Normal close: underlying connection is still open, so we\\ntry {\\npool.returnObject(this);\\n} catch (final IllegalStateException e) {\\npassivate();\\ngetInnermostDelegate().close();\\n} catch (final SQLException | RuntimeException e) {\\nthrow e;\\n} catch (final Exception e) {\\nthrow new SQLException(\\\"Cannot close connection (return to pool failed)\\\", e);\\n}\\n}\\n}\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 841,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.56,
+        "probabilities": {
+          "actionable": 0.71,
+          "unactionable": 0.27,
+          "unknown": 0.02
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.56,
+    "probabilities": {
+      "actionable": 0.71,
+      "unactionable": 0.27,
+      "unknown": 0.02
+    }
+  }
+}

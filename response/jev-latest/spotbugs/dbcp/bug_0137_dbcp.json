@@ -1,0 +1,58 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0137_dbcp.json",
+  "warning": {
+    "category": "DODGY_CODE",
+    "vtype": "DLS_DEAD_LOCAL_STORE",
+    "priority": "3",
+    "rank": "20",
+    "project": "dbcp",
+    "warning_line": "final int size = resultSetList.size();\n",
+    "warning_method": "@Override\npublic void close() throws SQLException {\nif (isClosed()) {\nreturn;\n}\nfinal List<Exception> thrownList = new ArrayList<>();\ntry {\nif (connection != null) {\nconnection.removeTrace(this);\nconnection = null;\n}\nfinal List<AbandonedTrace> resultSetList = getTrace();\nif (resultSetList != null) {\nfinal int size = resultSetList.size();\nfinal ResultSet[] resultSets = resultSetList.toArray(Utils.EMPTY_RESULT_SET_ARRAY);\nfor (final ResultSet resultSet : resultSets) {\nif (resultSet != null) {\ntry {\nresultSet.close();\n} catch (final Exception e) {\nif (connection != null) {\nconnection.handleExceptionNoThrow(e);\n}\nthrownList.add(e);\n}\n}\n}\nclearTrace();\n}\nif (statement != null) {\ntry {\nstatement.close();\n} catch (final Exception e) {\nif (connection != null) {\nconnection.handleExceptionNoThrow(e);\n}\nthrownList.add(e);\n}\n}\n} finally {\nclosed = true;\nstatement = null;\nif (!thrownList.isEmpty()) {\nthrow new SQLExceptionList(thrownList);\n}\n}\n}"
+  },
+  "created_at": "2026-10-16T12:40:24.428537+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"category\": \"DODGY_CODE\",\n  \"vtype\": \"DLS_DEAD_LOCAL_STORE\",\n  \"priority\": \"3\",\n  \"rank\": \"20\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"final int size = resultSetList.size();\\n\",\n  \"warning_method\": \"@Override\\npublic void close() throws SQLException {\\nif (isClosed()) {\\nreturn;\\n}\\nfinal List<Exception> thrownList = new ArrayList<>();\\ntry {\\nif (connection != null) {\\nconnection.removeTrace(this);\\nconnection = null;\\n}\\nfinal List<AbandonedTrace> resultSetList = getTrace();\\nif (resultSetList != null) {\\nfinal int size = resultSetList.size();\\nfinal ResultSet[] resultSets = resultSetList.toArray(Utils.EMPTY_RESULT_SET_ARRAY);\\nfor (final ResultSet resultSet : resultSets) {\\nif (resultSet != null) {\\ntry {\\nresultSet.close();\\n} catch (final Exception e) {\\nif (connection != null) {\\nconnection.handleExceptionNoThrow(e);\\n}\\nthrownList.add(e);\\n}\\n}\\n}\\nclearTrace();\\n}\\nif (statement != null) {\\ntry {\\nstatement.close();\\n} catch (final Exception e) {\\nif (connection != null) {\\nconnection.handleExceptionNoThrow(e);\\n}\\nthrownList.add(e);\\n}\\n}\\n} finally {\\nclosed = true;\\nstatement = null;\\nif (!thrownList.isEmpty()) {\\nthrow new SQLExceptionList(thrownList);\\n}\\n}\\n}\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 826,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.62,
+        "probabilities": {
+          "actionable": 0.24,
+          "unactionable": 0.75,
+          "unknown": 0.01
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.62,
+    "probabilities": {
+      "actionable": 0.24,
+      "unactionable": 0.75,
+      "unknown": 0.01
+    }
+  }
+}
