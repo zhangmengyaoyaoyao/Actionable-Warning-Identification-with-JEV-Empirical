@@ -1,0 +1,92 @@
+{
+  "source_file": "report/spotbugs/bcel/bug_0008_bcel.json",
+  "warning": {
+    "category": "MALICIOUS_CODE",
+    "vtype": "MS_PKGPROTECT",
+    "priority": "2",
+    "rank": "18",
+    "project": "bcel",
+    "warning_line": "@Deprecated\npublic static final String[] TYPE_NAMES = { ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, \"boolean\", \"char\", \"float\", \"double\", \"byte\", \"short\", \"int\", \"long\", \"void\", \"array\", \"object\", \"unknown\", \"address\" };",
+    "warning_method": "@Deprecated\npublic static final String[] TYPE_NAMES = { ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, \"boolean\", \"char\", \"float\", \"double\", \"byte\", \"short\", \"int\", \"long\", \"void\", \"array\", \"object\", \"unknown\", \"address\" };"
+  },
+  "created_at": "2026-10-24T08:45:21.806356+00:00",
+  "primitive": "score",
+  "request": {
+    "model": "jev-latest",
+    "state": "{\n  \"category\": \"MALICIOUS_CODE\",\n  \"vtype\": \"MS_PKGPROTECT\",\n  \"priority\": \"2\",\n  \"rank\": \"18\",\n  \"project\": \"bcel\",\n  \"warning_line\": \"@Deprecated\\npublic static final String[] TYPE_NAMES = { ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, \\\"boolean\\\", \\\"char\\\", \\\"float\\\", \\\"double\\\", \\\"byte\\\", \\\"short\\\", \\\"int\\\", \\\"long\\\", \\\"void\\\", \\\"array\\\", \\\"object\\\", \\\"unknown\\\", \\\"address\\\" };\",\n  \"warning_method\": \"@Deprecated\\npublic static final String[] TYPE_NAMES = { ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, ILLEGAL_TYPE, \\\"boolean\\\", \\\"char\\\", \\\"float\\\", \\\"double\\\", \\\"byte\\\", \\\"short\\\", \\\"int\\\", \\\"long\\\", \\\"void\\\", \\\"array\\\", \\\"object\\\", \\\"unknown\\\", \\\"address\\\" };\"\n}",
+    "questions": {
+      "actionability_choice": {
+        "type": "choice",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Select exactly one option.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Rate the warning on the ordered scale from unactionable to actionable.",
+        "criteria": [
+          "A false positive, intentional pattern, or warning that does not require a fix.",
+          "A genuine defect or risk that warrants developer attention and a code change."
+        ]
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Is this warning actionable?",
+        "criteria": {
+          "true": "A genuine defect or risk that warrants developer attention and a code change.",
+          "false": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "usage": {
+      "input_tokens": 815,
+      "output_tokens": 82
+    },
+    "answers": {
+      "actionability_choice": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.86,
+        "probabilities": {
+          "actionable": 0.07,
+          "unactionable": 0.93
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "score": 0.07,
+        "confidence": 0.86,
+        "legend": {
+          "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "1": "A genuine defect or risk that warrants developer attention and a code change."
+        },
+        "probabilities": {
+          "0": 0.93,
+          "1": 0.07
+        }
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "noul": 0.15
+      }
+    }
+  },
+  "answer": {
+    "type": "score",
+    "score": 0.07,
+    "confidence": 0.86,
+    "legend": {
+      "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+      "1": "A genuine defect or risk that warrants developer attention and a code change."
+    },
+    "probabilities": {
+      "0": 0.93,
+      "1": 0.07
+    }
+  }
+}

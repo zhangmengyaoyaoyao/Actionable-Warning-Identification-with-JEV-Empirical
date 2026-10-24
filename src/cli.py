@@ -50,7 +50,7 @@ def build_parser():
 
     jev = sub.add_parser(
         "jev",
-        help="调用 JEV (TypeSafe System One) Choice 模式分类警告，完整结果写入 response/",
+        help="调用 JEV Choice/Score/Noul（一次并行三问）分类警告，结果写入 jev-choice/score/noul",
     )
     jev.add_argument("--lang", choices=["java", "c"], required=True)
     jev.add_argument("--projects", nargs="+", default=["all"], help="Java 项目名，或 all")
@@ -58,13 +58,17 @@ def build_parser():
     jev.add_argument(
         "--model",
         default="jev-latest",
-        help="JEV 模型名，写入 response/<model>/，默认 jev-latest",
+        help="TypeSafe API 模型名（仅请求用），默认 jev-latest；结果目录固定为 jev-choice/score/noul",
     )
     jev.add_argument("--api-key", default=None, help="覆盖 TYPESAFE_API_KEY")
     jev.add_argument("--base-url", default=None, help="覆盖 TypeSafe base URL")
     jev.add_argument("--start", type=int, default=None, help="JSON 文件切片起点（含）")
     jev.add_argument("--end", type=int, default=None, help="JSON 文件切片终点（不含）")
-    jev.add_argument("--skip-existing", action="store_true", help="已有结果 json 则跳过")
+    jev.add_argument(
+        "--skip-existing",
+        action="store_true",
+        help="choice/score/noul 三个结果文件都已存在则跳过",
+    )
 
     jev_excel = sub.add_parser(
         "jev-excel",
@@ -73,8 +77,16 @@ def build_parser():
     jev_excel.add_argument("--lang", choices=["java", "c"], required=True)
     jev_excel.add_argument("--projects", nargs="+", default=["all"], help="Java 项目名，或 all")
     jev_excel.add_argument("--tool", default="spotbugs")
-    jev_excel.add_argument("--model", default="jev-latest")
-    jev_excel.add_argument("--output", default=None, help="输出 xlsx 路径，默认 results/jev/<lang>_<model>.xlsx")
+    jev_excel.add_argument(
+        "--model",
+        default="all",
+        help="结果目录名：jev-choice / jev-score / jev-noul，或 all 一次导出三种",
+    )
+    jev_excel.add_argument(
+        "--output",
+        default=None,
+        help="输出 xlsx 路径；--model all 时忽略，写入 results/jev/<lang>_<dir>.xlsx",
+    )
 
     toexcel = sub.add_parser("toexcel", help="将 response/ 中的 txt 转为 excel，并链接人工标记")
     _add_common_experiment_args(toexcel)
@@ -141,7 +153,6 @@ def cmd_jev(args):
     ) as client:
         run_jev_experiments(
             client=client,
-            model=args.model,
             lang=args.lang,
             projects=projects,
             tool=args.tool,
@@ -152,11 +163,26 @@ def cmd_jev(args):
 
 
 def cmd_jev_excel(args):
-    from src.jev.export import export_jev_results
+    from src.jev.export import export_all_primitives, export_jev_results
+    from src.jev.questions import PRIMITIVE_DIRS
 
     projects = None if args.lang == "c" else resolve_list(args.projects, JAVA_PROJECTS)
+    model = args.model
+    if model in {"all", "ALL"}:
+        export_all_primitives(
+            lang=args.lang,
+            projects=projects,
+            tool=args.tool,
+        )
+        return
+
+    allowed = set(PRIMITIVE_DIRS.values())
+    if model not in allowed and model != "jev-latest":
+        raise SystemExit(
+            f"--model 应为 {' / '.join(sorted(allowed))} 或 all，收到: {model}"
+        )
     export_jev_results(
-        model=args.model,
+        model=model,
         lang=args.lang,
         projects=projects,
         tool=args.tool,

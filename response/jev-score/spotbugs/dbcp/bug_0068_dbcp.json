@@ -1,0 +1,92 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0068_dbcp.json",
+  "warning": {
+    "category": "DODGY_CODE",
+    "vtype": "REC_CATCH_EXCEPTION",
+    "priority": "3",
+    "rank": "20",
+    "project": "dbcp",
+    "warning_line": "} catch (final Exception t) {\n",
+    "warning_method": "static Driver createDriver(final BasicDataSource basicDataSource) throws SQLException {\nDriver driverToUse = basicDataSource.getDriver();\nfinal String driverClassName = basicDataSource.getDriverClassName();\nfinal ClassLoader driverClassLoader = basicDataSource.getDriverClassLoader();\nfinal String url = basicDataSource.getUrl();\nif (driverToUse == null) {\nClass<?> driverFromCCL = null;\nif (driverClassName != null) {\ntry {\ntry {\nif (driverClassLoader == null) {\ndriverFromCCL = Class.forName(driverClassName);\n} else {\ndriverFromCCL = Class.forName(driverClassName, true, driverClassLoader);\n}\n} catch (final ClassNotFoundException cnfe) {\ndriverFromCCL = Thread.currentThread().getContextClassLoader().loadClass(driverClassName);\n}\n} catch (final Exception t) {\nfinal String message = \"Cannot load JDBC driver class '\" + driverClassName + \"'\";\nbasicDataSource.log(message, t);\nthrow new SQLException(message, t);\n}\n}\ntry {\nif (driverFromCCL == null) {\ndriverToUse = DriverManager.getDriver(url);\n} else {\ndriverToUse = (Driver) driverFromCCL.getConstructor().newInstance();\nif (!driverToUse.acceptsURL(url)) {\nthrow new SQLException(\"No suitable driver\", \"08001\");\n}\n}\n} catch (final Exception t) {\nfinal String message = \"Cannot create JDBC driver of class '\" + (driverClassName != null ? driverClassName : \"\") + \"' for connect URL '\" + url + \"'\";\nbasicDataSource.log(message, t);\nthrow new SQLException(message, t);\n}\n}\nreturn driverToUse;\n}"
+  },
+  "created_at": "2026-10-24T08:44:54.020396+00:00",
+  "primitive": "score",
+  "request": {
+    "model": "jev-latest",
+    "state": "{\n  \"category\": \"DODGY_CODE\",\n  \"vtype\": \"REC_CATCH_EXCEPTION\",\n  \"priority\": \"3\",\n  \"rank\": \"20\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"} catch (final Exception t) {\\n\",\n  \"warning_method\": \"static Driver createDriver(final BasicDataSource basicDataSource) throws SQLException {\\nDriver driverToUse = basicDataSource.getDriver();\\nfinal String driverClassName = basicDataSource.getDriverClassName();\\nfinal ClassLoader driverClassLoader = basicDataSource.getDriverClassLoader();\\nfinal String url = basicDataSource.getUrl();\\nif (driverToUse == null) {\\nClass<?> driverFromCCL = null;\\nif (driverClassName != null) {\\ntry {\\ntry {\\nif (driverClassLoader == null) {\\ndriverFromCCL = Class.forName(driverClassName);\\n} else {\\ndriverFromCCL = Class.forName(driverClassName, true, driverClassLoader);\\n}\\n} catch (final ClassNotFoundException cnfe) {\\ndriverFromCCL = Thread.currentThread().getContextClassLoader().loadClass(driverClassName);\\n}\\n} catch (final Exception t) {\\nfinal String message = \\\"Cannot load JDBC driver class '\\\" + driverClassName + \\\"'\\\";\\nbasicDataSource.log(message, t);\\nthrow new SQLException(message, t);\\n}\\n}\\ntry {\\nif (driverFromCCL == null) {\\ndriverToUse = DriverManager.getDriver(url);\\n} else {\\ndriverToUse = (Driver) driverFromCCL.getConstructor().newInstance();\\nif (!driverToUse.acceptsURL(url)) {\\nthrow new SQLException(\\\"No suitable driver\\\", \\\"08001\\\");\\n}\\n}\\n} catch (final Exception t) {\\nfinal String message = \\\"Cannot create JDBC driver of class '\\\" + (driverClassName != null ? driverClassName : \\\"\\\") + \\\"' for connect URL '\\\" + url + \\\"'\\\";\\nbasicDataSource.log(message, t);\\nthrow new SQLException(message, t);\\n}\\n}\\nreturn driverToUse;\\n}\"\n}",
+    "questions": {
+      "actionability_choice": {
+        "type": "choice",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Select exactly one option.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Rate the warning on the ordered scale from unactionable to actionable.",
+        "criteria": [
+          "A false positive, intentional pattern, or warning that does not require a fix.",
+          "A genuine defect or risk that warrants developer attention and a code change."
+        ]
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Is this warning actionable?",
+        "criteria": {
+          "true": "A genuine defect or risk that warrants developer attention and a code change.",
+          "false": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "usage": {
+      "input_tokens": 1177,
+      "output_tokens": 82
+    },
+    "answers": {
+      "actionability_choice": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.34,
+        "probabilities": {
+          "actionable": 0.33,
+          "unactionable": 0.67
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "score": 0.36,
+        "confidence": 0.28,
+        "legend": {
+          "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "1": "A genuine defect or risk that warrants developer attention and a code change."
+        },
+        "probabilities": {
+          "0": 0.64,
+          "1": 0.36
+        }
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "noul": 0.4
+      }
+    }
+  },
+  "answer": {
+    "type": "score",
+    "score": 0.36,
+    "confidence": 0.28,
+    "legend": {
+      "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+      "1": "A genuine defect or risk that warrants developer attention and a code change."
+    },
+    "probabilities": {
+      "0": 0.64,
+      "1": 0.36
+    }
+  }
+}

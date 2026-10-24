@@ -1,0 +1,92 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0118_dbcp.json",
+  "warning": {
+    "category": "SECURITY",
+    "vtype": "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING",
+    "priority": "3",
+    "rank": "15",
+    "project": "dbcp",
+    "warning_line": "connection.prepareStatement(sql));\n",
+    "warning_method": "@Override\npublic PreparedStatement prepareStatement(final String sql) throws SQLException {\ncheckOpen();\ntry {\nfinal DelegatingPreparedStatement dps = new DelegatingPreparedStatement(this, connection.prepareStatement(sql));\ninitializeStatement(dps);\nreturn dps;\n} catch (final SQLException e) {\nhandleException(e);\nreturn null;\n}\n}"
+  },
+  "created_at": "2026-10-24T08:45:07.453540+00:00",
+  "primitive": "score",
+  "request": {
+    "model": "jev-latest",
+    "state": "{\n  \"category\": \"SECURITY\",\n  \"vtype\": \"SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING\",\n  \"priority\": \"3\",\n  \"rank\": \"15\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"connection.prepareStatement(sql));\\n\",\n  \"warning_method\": \"@Override\\npublic PreparedStatement prepareStatement(final String sql) throws SQLException {\\ncheckOpen();\\ntry {\\nfinal DelegatingPreparedStatement dps = new DelegatingPreparedStatement(this, connection.prepareStatement(sql));\\ninitializeStatement(dps);\\nreturn dps;\\n} catch (final SQLException e) {\\nhandleException(e);\\nreturn null;\\n}\\n}\"\n}",
+    "questions": {
+      "actionability_choice": {
+        "type": "choice",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Select exactly one option.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Rate the warning on the ordered scale from unactionable to actionable.",
+        "criteria": [
+          "A false positive, intentional pattern, or warning that does not require a fix.",
+          "A genuine defect or risk that warrants developer attention and a code change."
+        ]
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Is this warning actionable?",
+        "criteria": {
+          "true": "A genuine defect or risk that warrants developer attention and a code change.",
+          "false": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "usage": {
+      "input_tokens": 785,
+      "output_tokens": 82
+    },
+    "answers": {
+      "actionability_choice": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.62,
+        "probabilities": {
+          "actionable": 0.19,
+          "unactionable": 0.81
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "score": 0.2,
+        "confidence": 0.6,
+        "legend": {
+          "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "1": "A genuine defect or risk that warrants developer attention and a code change."
+        },
+        "probabilities": {
+          "0": 0.8,
+          "1": 0.2
+        }
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "noul": 0.27
+      }
+    }
+  },
+  "answer": {
+    "type": "score",
+    "score": 0.2,
+    "confidence": 0.6,
+    "legend": {
+      "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+      "1": "A genuine defect or risk that warrants developer attention and a code change."
+    },
+    "probabilities": {
+      "0": 0.8,
+      "1": 0.2
+    }
+  }
+}

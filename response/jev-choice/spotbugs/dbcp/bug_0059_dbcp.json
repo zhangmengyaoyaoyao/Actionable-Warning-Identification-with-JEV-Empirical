@@ -1,0 +1,88 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0059_dbcp.json",
+  "warning": {
+    "category": "CORRECTNESS",
+    "vtype": "NP_NONNULL_RETURN_VIOLATION",
+    "priority": "1",
+    "rank": "6",
+    "project": "dbcp",
+    "warning_line": "return null;\n",
+    "warning_method": "@SuppressWarnings(\"resource\")\n@Override\npublic PreparedStatement prepareStatement(final String sql) throws SQLException {\ncheckOpen();\ntry {\nreturn init(new DelegatingPreparedStatement(this, connection.prepareStatement(sql)));\n} catch (final SQLException e) {\nhandleException(e);\nreturn null;\n}\n}"
+  },
+  "created_at": "2026-10-24T08:44:51.349672+00:00",
+  "primitive": "choice",
+  "request": {
+    "model": "jev-latest",
+    "state": "{\n  \"category\": \"CORRECTNESS\",\n  \"vtype\": \"NP_NONNULL_RETURN_VIOLATION\",\n  \"priority\": \"1\",\n  \"rank\": \"6\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"return null;\\n\",\n  \"warning_method\": \"@SuppressWarnings(\\\"resource\\\")\\n@Override\\npublic PreparedStatement prepareStatement(final String sql) throws SQLException {\\ncheckOpen();\\ntry {\\nreturn init(new DelegatingPreparedStatement(this, connection.prepareStatement(sql)));\\n} catch (final SQLException e) {\\nhandleException(e);\\nreturn null;\\n}\\n}\"\n}",
+    "questions": {
+      "actionability_choice": {
+        "type": "choice",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Select exactly one option.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Rate the warning on the ordered scale from unactionable to actionable.",
+        "criteria": [
+          "A false positive, intentional pattern, or warning that does not require a fix.",
+          "A genuine defect or risk that warrants developer attention and a code change."
+        ]
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Is this warning actionable?",
+        "criteria": {
+          "true": "A genuine defect or risk that warrants developer attention and a code change.",
+          "false": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "usage": {
+      "input_tokens": 759,
+      "output_tokens": 81
+    },
+    "answers": {
+      "actionability_choice": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.48,
+        "probabilities": {
+          "actionable": 0.74,
+          "unactionable": 0.26
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "score": 0.72,
+        "confidence": 0.44,
+        "legend": {
+          "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "1": "A genuine defect or risk that warrants developer attention and a code change."
+        },
+        "probabilities": {
+          "0": 0.28,
+          "1": 0.72
+        }
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "noul": 0.66
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.48,
+    "probabilities": {
+      "actionable": 0.74,
+      "unactionable": 0.26
+    }
+  }
+}

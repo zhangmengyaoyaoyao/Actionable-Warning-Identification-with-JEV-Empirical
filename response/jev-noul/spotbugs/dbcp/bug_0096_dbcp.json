@@ -1,0 +1,83 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0096_dbcp.json",
+  "warning": {
+    "category": "DODGY_CODE",
+    "vtype": "NP_LOAD_OF_KNOWN_NULL_VALUE",
+    "priority": "3",
+    "rank": "19",
+    "project": "dbcp",
+    "warning_line": "closeDueToException(info);\n",
+    "warning_method": "@Override\npublic Connection getConnection(final String userName, final String userPassword) throws SQLException {\nif (instanceKey == null) {\nthrow new SQLException(\"Must set the ConnectionPoolDataSource \" + \"through setDataSourceName or setConnectionPoolDataSource\" + \" before calling getConnection.\");\n}\ngetConnectionCalled = true;\nPooledConnectionAndInfo info = null;\ntry {\ninfo = getPooledConnectionAndInfo(userName, userPassword);\n} catch (final NoSuchElementException e) {\ncloseDueToException(info);\nthrow new SQLException(\"Cannot borrow connection from pool\", e);\n} catch (final RuntimeException | SQLException e) {\ncloseDueToException(info);\nthrow e;\n} catch (final Exception e) {\ncloseDueToException(info);\nthrow new SQLException(\"Cannot borrow connection from pool\", e);\n}\nif (!(null == userPassword ? null == info.getPassword() : userPassword.equals(info.getPassword()))) {\ntry {\ntestCPDS(userName, userPassword);\n} catch (final SQLException ex) {\ncloseDueToException(info);\nthrow new SQLException(\"Given password did not match password used\" + \" to create the PooledConnection.\", ex);\n} catch (final javax.naming.NamingException ne) {\nthrow new SQLException(\"NamingException encountered connecting to database\", ne);\n}\nfinal UserPassKey upkey = info.getUserPassKey();\nfinal PooledConnectionManager manager = getConnectionManager(upkey);\nmanager.invalidate(info.getPooledConnection());\nmanager.setPassword(upkey.getPassword());\ninfo = null;\nfor (int i = 0; i < 10; i++) {\ntry {\ninfo = getPooledConnectionAndInfo(userName, userPassword);\n} catch (final NoSuchElementException e) {\ncloseDueToException(info);\nthrow new SQLException(\"Cannot borrow connection from pool\", e);\n} catch (final RuntimeException | SQLException e) {\ncloseDueToException(info);\nthrow e;\n} catch (final Exception e) {\ncloseDueToException(info);\nthrow new SQLException(\"Cannot borrow connection from pool\", e);\n}\nif (info != null && userPassword != null && userPassword.equals(info.getPassword())) {\nbreak;\n}\nif (info != null) {\nmanager.invalidate(info.getPooledConnection());\n}\ninfo = null;\n}\nif (info == null) {\nthrow new SQLException(\"Cannot borrow connection from pool - password change failure.\");\n}\n}\nfinal Connection con = info.getPooledConnection().getConnection();\ntry {\nsetupDefaults(con, userName);\ncon.clearWarnings();\nreturn con;\n} catch (final SQLException ex) {\ntry {\ncon.close();\n} catch (final Exception exc) {\ngetLogWriter().println(\"ignoring exception during close: \" + exc);\n}\nthrow ex;\n}\n}"
+  },
+  "created_at": "2026-10-24T08:45:01.569111+00:00",
+  "primitive": "noul",
+  "request": {
+    "model": "jev-latest",
+    "state": "{\n  \"category\": \"DODGY_CODE\",\n  \"vtype\": \"NP_LOAD_OF_KNOWN_NULL_VALUE\",\n  \"priority\": \"3\",\n  \"rank\": \"19\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"closeDueToException(info);\\n\",\n  \"warning_method\": \"@Override\\npublic Connection getConnection(final String userName, final String userPassword) throws SQLException {\\nif (instanceKey == null) {\\nthrow new SQLException(\\\"Must set the ConnectionPoolDataSource \\\" + \\\"through setDataSourceName or setConnectionPoolDataSource\\\" + \\\" before calling getConnection.\\\");\\n}\\ngetConnectionCalled = true;\\nPooledConnectionAndInfo info = null;\\ntry {\\ninfo = getPooledConnectionAndInfo(userName, userPassword);\\n} catch (final NoSuchElementException e) {\\ncloseDueToException(info);\\nthrow new SQLException(\\\"Cannot borrow connection from pool\\\", e);\\n} catch (final RuntimeException | SQLException e) {\\ncloseDueToException(info);\\nthrow e;\\n} catch (final Exception e) {\\ncloseDueToException(info);\\nthrow new SQLException(\\\"Cannot borrow connection from pool\\\", e);\\n}\\nif (!(null == userPassword ? null == info.getPassword() : userPassword.equals(info.getPassword()))) {\\ntry {\\ntestCPDS(userName, userPassword);\\n} catch (final SQLException ex) {\\ncloseDueToException(info);\\nthrow new SQLException(\\\"Given password did not match password used\\\" + \\\" to create the PooledConnection.\\\", ex);\\n} catch (final javax.naming.NamingException ne) {\\nthrow new SQLException(\\\"NamingException encountered connecting to database\\\", ne);\\n}\\nfinal UserPassKey upkey = info.getUserPassKey();\\nfinal PooledConnectionManager manager = getConnectionManager(upkey);\\nmanager.invalidate(info.getPooledConnection());\\nmanager.setPassword(upkey.getPassword());\\ninfo = null;\\nfor (int i = 0; i < 10; i++) {\\ntry {\\ninfo = getPooledConnectionAndInfo(userName, userPassword);\\n} catch (final NoSuchElementException e) {\\ncloseDueToException(info);\\nthrow new SQLException(\\\"Cannot borrow connection from pool\\\", e);\\n} catch (final RuntimeException | SQLException e) {\\ncloseDueToException(info);\\nthrow e;\\n} catch (final Exception e) {\\ncloseDueToException(info);\\nthrow new SQLException(\\\"Cannot borrow connection from pool\\\", e);\\n}\\nif (info != null && userPassword != null && userPassword.equals(info.getPassword())) {\\nbreak;\\n}\\nif (info != null) {\\nmanager.invalidate(info.getPooledConnection());\\n}\\ninfo = null;\\n}\\nif (info == null) {\\nthrow new SQLException(\\\"Cannot borrow connection from pool - password change failure.\\\");\\n}\\n}\\nfinal Connection con = info.getPooledConnection().getConnection();\\ntry {\\nsetupDefaults(con, userName);\\ncon.clearWarnings();\\nreturn con;\\n} catch (final SQLException ex) {\\ntry {\\ncon.close();\\n} catch (final Exception exc) {\\ngetLogWriter().println(\\\"ignoring exception during close: \\\" + exc);\\n}\\nthrow ex;\\n}\\n}\"\n}",
+    "questions": {
+      "actionability_choice": {
+        "type": "choice",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Select exactly one option.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Rate the warning on the ordered scale from unactionable to actionable.",
+        "criteria": [
+          "A false positive, intentional pattern, or warning that does not require a fix.",
+          "A genuine defect or risk that warrants developer attention and a code change."
+        ]
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Is this warning actionable?",
+        "criteria": {
+          "true": "A genuine defect or risk that warrants developer attention and a code change.",
+          "false": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "usage": {
+      "input_tokens": 1428,
+      "output_tokens": 81
+    },
+    "answers": {
+      "actionability_choice": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.38,
+        "probabilities": {
+          "actionable": 0.69,
+          "unactionable": 0.31
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "score": 0.69,
+        "confidence": 0.38,
+        "legend": {
+          "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "1": "A genuine defect or risk that warrants developer attention and a code change."
+        },
+        "probabilities": {
+          "0": 0.31,
+          "1": 0.69
+        }
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "noul": 0.57
+      }
+    }
+  },
+  "answer": {
+    "type": "noul",
+    "noul": 0.57
+  }
+}

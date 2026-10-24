@@ -1,0 +1,92 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0029_dbcp.json",
+  "warning": {
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "dbcp",
+    "warning_line": "} catch (final Exception ie) {\n",
+    "warning_method": "@Override\npublic synchronized void close() throws SQLException {\nif (isClosedInternal()) {\nreturn;\n}\nboolean isUnderlyingConnectionClosed;\ntry {\nisUnderlyingConnectionClosed = getDelegateInternal().isClosed();\n} catch (final SQLException e) {\ntry {\npool.invalidateObject(this);\n} catch (final IllegalStateException ise) {\npassivate();\ngetInnermostDelegate().close();\n} catch (final Exception ie) {\n}\nthrow new SQLException(\"Cannot close connection (isClosed check failed)\", e);\n}\nif (isUnderlyingConnectionClosed) {\n// Abnormal close: underlying connection closed unexpectedly, so we\ntry {\npool.invalidateObject(this);\n} catch (final IllegalStateException e) {\npassivate();\ngetInnermostDelegate().close();\n} catch (final Exception e) {\nthrow new SQLException(\"Cannot close connection (invalidating pooled object failed)\", e);\n}\n} else {\n// Normal close: underlying connection is still open, so we\ntry {\npool.returnObject(this);\n} catch (final IllegalStateException e) {\npassivate();\ngetInnermostDelegate().close();\n} catch (final SQLException | RuntimeException e) {\nthrow e;\n} catch (final Exception e) {\nthrow new SQLException(\"Cannot close connection (return to pool failed)\", e);\n}\n}\n}"
+  },
+  "created_at": "2026-10-24T08:44:43.802458+00:00",
+  "primitive": "score",
+  "request": {
+    "model": "jev-latest",
+    "state": "{\n  \"category\": \"BAD_PRACTICE\",\n  \"vtype\": \"DE_MIGHT_IGNORE\",\n  \"priority\": \"3\",\n  \"rank\": \"19\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"} catch (final Exception ie) {\\n\",\n  \"warning_method\": \"@Override\\npublic synchronized void close() throws SQLException {\\nif (isClosedInternal()) {\\nreturn;\\n}\\nboolean isUnderlyingConnectionClosed;\\ntry {\\nisUnderlyingConnectionClosed = getDelegateInternal().isClosed();\\n} catch (final SQLException e) {\\ntry {\\npool.invalidateObject(this);\\n} catch (final IllegalStateException ise) {\\npassivate();\\ngetInnermostDelegate().close();\\n} catch (final Exception ie) {\\n}\\nthrow new SQLException(\\\"Cannot close connection (isClosed check failed)\\\", e);\\n}\\nif (isUnderlyingConnectionClosed) {\\n// Abnormal close: underlying connection closed unexpectedly, so we\\ntry {\\npool.invalidateObject(this);\\n} catch (final IllegalStateException e) {\\npassivate();\\ngetInnermostDelegate().close();\\n} catch (final Exception e) {\\nthrow new SQLException(\\\"Cannot close connection (invalidating pooled object failed)\\\", e);\\n}\\n} else {\\n// Normal close: underlying connection is still open, so we\\ntry {\\npool.returnObject(this);\\n} catch (final IllegalStateException e) {\\npassivate();\\ngetInnermostDelegate().close();\\n} catch (final SQLException | RuntimeException e) {\\nthrow e;\\n} catch (final Exception e) {\\nthrow new SQLException(\\\"Cannot close connection (return to pool failed)\\\", e);\\n}\\n}\\n}\"\n}",
+    "questions": {
+      "actionability_choice": {
+        "type": "choice",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Select exactly one option.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Rate the warning on the ordered scale from unactionable to actionable.",
+        "criteria": [
+          "A false positive, intentional pattern, or warning that does not require a fix.",
+          "A genuine defect or risk that warrants developer attention and a code change."
+        ]
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Is this warning actionable?",
+        "criteria": {
+          "true": "A genuine defect or risk that warrants developer attention and a code change.",
+          "false": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "usage": {
+      "input_tokens": 1043,
+      "output_tokens": 81
+    },
+    "answers": {
+      "actionability_choice": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.68,
+        "probabilities": {
+          "actionable": 0.84,
+          "unactionable": 0.16
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "score": 0.8,
+        "confidence": 0.6,
+        "legend": {
+          "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "1": "A genuine defect or risk that warrants developer attention and a code change."
+        },
+        "probabilities": {
+          "0": 0.2,
+          "1": 0.8
+        }
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "noul": 0.68
+      }
+    }
+  },
+  "answer": {
+    "type": "score",
+    "score": 0.8,
+    "confidence": 0.6,
+    "legend": {
+      "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+      "1": "A genuine defect or risk that warrants developer attention and a code change."
+    },
+    "probabilities": {
+      "0": 0.2,
+      "1": 0.8
+    }
+  }
+}

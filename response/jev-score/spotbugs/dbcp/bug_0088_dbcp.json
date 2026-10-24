@@ -1,0 +1,92 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0088_dbcp.json",
+  "warning": {
+    "category": "DODGY_CODE",
+    "vtype": "REC_CATCH_EXCEPTION",
+    "priority": "3",
+    "rank": "20",
+    "project": "dbcp",
+    "warning_line": "} catch (final Exception e) {\n",
+    "warning_method": "@Override\npublic boolean validateObject(final UserPassKey key, final PooledObject<PooledConnectionAndInfo> pooledObject) {\ntry {\nvalidateLifetime(pooledObject);\n} catch (final Exception e) {\nreturn false;\n}\nboolean valid = false;\nfinal PooledConnection pooledConn = pooledObject.getObject().getPooledConnection();\nConnection conn = null;\nvalidatingSet.add(pooledConn);\nif (null == validationQuery) {\nDuration timeoutDuration = validationQueryTimeoutDuration;\nif (timeoutDuration.isNegative()) {\ntimeoutDuration = Duration.ZERO;\n}\ntry {\nconn = pooledConn.getConnection();\nvalid = conn.isValid((int) timeoutDuration.getSeconds());\n} catch (final SQLException e) {\nvalid = false;\n} finally {\nUtils.closeQuietly((AutoCloseable) conn);\nvalidatingSet.remove(pooledConn);\n}\n} else {\nStatement stmt = null;\nResultSet rset = null;\nvalidatingSet.add(pooledConn);\ntry {\nconn = pooledConn.getConnection();\nstmt = conn.createStatement();\nrset = stmt.executeQuery(validationQuery);\nvalid = rset.next();\nif (rollbackAfterValidation) {\nconn.rollback();\n}\n} catch (final Exception e) {\nvalid = false;\n} finally {\nUtils.closeQuietly((AutoCloseable) rset);\nUtils.closeQuietly((AutoCloseable) stmt);\nUtils.closeQuietly((AutoCloseable) conn);\nvalidatingSet.remove(pooledConn);\n}\n}\nreturn valid;\n}"
+  },
+  "created_at": "2026-10-24T08:44:59.405098+00:00",
+  "primitive": "score",
+  "request": {
+    "model": "jev-latest",
+    "state": "{\n  \"category\": \"DODGY_CODE\",\n  \"vtype\": \"REC_CATCH_EXCEPTION\",\n  \"priority\": \"3\",\n  \"rank\": \"20\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"} catch (final Exception e) {\\n\",\n  \"warning_method\": \"@Override\\npublic boolean validateObject(final UserPassKey key, final PooledObject<PooledConnectionAndInfo> pooledObject) {\\ntry {\\nvalidateLifetime(pooledObject);\\n} catch (final Exception e) {\\nreturn false;\\n}\\nboolean valid = false;\\nfinal PooledConnection pooledConn = pooledObject.getObject().getPooledConnection();\\nConnection conn = null;\\nvalidatingSet.add(pooledConn);\\nif (null == validationQuery) {\\nDuration timeoutDuration = validationQueryTimeoutDuration;\\nif (timeoutDuration.isNegative()) {\\ntimeoutDuration = Duration.ZERO;\\n}\\ntry {\\nconn = pooledConn.getConnection();\\nvalid = conn.isValid((int) timeoutDuration.getSeconds());\\n} catch (final SQLException e) {\\nvalid = false;\\n} finally {\\nUtils.closeQuietly((AutoCloseable) conn);\\nvalidatingSet.remove(pooledConn);\\n}\\n} else {\\nStatement stmt = null;\\nResultSet rset = null;\\nvalidatingSet.add(pooledConn);\\ntry {\\nconn = pooledConn.getConnection();\\nstmt = conn.createStatement();\\nrset = stmt.executeQuery(validationQuery);\\nvalid = rset.next();\\nif (rollbackAfterValidation) {\\nconn.rollback();\\n}\\n} catch (final Exception e) {\\nvalid = false;\\n} finally {\\nUtils.closeQuietly((AutoCloseable) rset);\\nUtils.closeQuietly((AutoCloseable) stmt);\\nUtils.closeQuietly((AutoCloseable) conn);\\nvalidatingSet.remove(pooledConn);\\n}\\n}\\nreturn valid;\\n}\"\n}",
+    "questions": {
+      "actionability_choice": {
+        "type": "choice",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Select exactly one option.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Rate the warning on the ordered scale from unactionable to actionable.",
+        "criteria": [
+          "A false positive, intentional pattern, or warning that does not require a fix.",
+          "A genuine defect or risk that warrants developer attention and a code change."
+        ]
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Is this warning actionable?",
+        "criteria": {
+          "true": "A genuine defect or risk that warrants developer attention and a code change.",
+          "false": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "usage": {
+      "input_tokens": 1124,
+      "output_tokens": 81
+    },
+    "answers": {
+      "actionability_choice": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.44,
+        "probabilities": {
+          "actionable": 0.72,
+          "unactionable": 0.28
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "score": 0.72,
+        "confidence": 0.44,
+        "legend": {
+          "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "1": "A genuine defect or risk that warrants developer attention and a code change."
+        },
+        "probabilities": {
+          "0": 0.28,
+          "1": 0.72
+        }
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "noul": 0.65
+      }
+    }
+  },
+  "answer": {
+    "type": "score",
+    "score": 0.72,
+    "confidence": 0.44,
+    "legend": {
+      "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+      "1": "A genuine defect or risk that warrants developer attention and a code change."
+    },
+    "probabilities": {
+      "0": 0.28,
+      "1": 0.72
+    }
+  }
+}

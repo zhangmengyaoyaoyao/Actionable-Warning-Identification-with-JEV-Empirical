@@ -1,11 +1,18 @@
-"""Thin wrapper around TypeSafeClient for JEV Choice calls."""
+"""Thin wrapper around TypeSafeClient for JEV Choice / Score / Noul calls."""
 
 import os
 import time
 from typing import Any, Optional
 
 import src.config  # noqa: F401  # load .env via python-dotenv
-from src.jev.questions import QUESTION_ID, build_questions
+from src.jev.questions import (
+    QUESTION_ID_CHOICE,
+    QUESTION_ID_NOUL,
+    QUESTION_ID_SCORE,
+    QUESTION_IDS,
+    build_questions,
+    questions_for_request,
+)
 
 
 def _to_plain(obj: Any) -> Any:
@@ -32,7 +39,7 @@ def _to_plain(obj: Any) -> Any:
 
 
 class JevClient:
-    """Call JEV via TypeSafe system_one with a Choice question."""
+    """Call JEV via TypeSafe system_one with Choice, Score, and Noul in one request."""
 
     def __init__(
         self,
@@ -84,10 +91,10 @@ class JevClient:
 
     def classify_warning(self, state: str) -> dict:
         """
-        Ask JEV whether the warning state is actionable / unactionable / unknown.
+        Ask Choice, Score, and Noul about the same warning state in one call.
 
-        Returns a plain dict with the full response (model, answers, usage, ...)
-        plus a small request summary for reproducibility. No post-processing.
+        Returns a plain dict with the full request/response plus per-primitive
+        ``answers`` keyed by choice / score / noul.
         """
         questions = build_questions()
         last_error = None
@@ -103,32 +110,30 @@ class JevClient:
                 if not isinstance(payload, dict):
                     payload = {"raw": payload}
 
-                # Prefer answers / choices shapes from different SDK versions.
                 answers = payload.get("answers")
                 if answers is None and "choices" in payload:
                     answers = payload.get("choices")
+                if not isinstance(answers, dict):
+                    answers = {}
 
-                result = {
+                per_primitive = {}
+                for primitive, question_id in QUESTION_IDS.items():
+                    if question_id in answers:
+                        per_primitive[primitive] = answers[question_id]
+
+                return {
                     "request": {
                         "model": self.model,
-                        "question_id": QUESTION_ID,
                         "state": state,
-                        "questions": {
-                            QUESTION_ID: {
-                                "type": "choice",
-                                "instructions": questions[QUESTION_ID].instructions,
-                                "criteria": questions[QUESTION_ID].criteria,
-                            }
-                        },
+                        "questions": questions_for_request(questions),
                     },
                     "response": payload,
+                    "answers": per_primitive,
+                    # Convenience aliases for the three answers.
+                    "answer_choice": per_primitive.get("choice"),
+                    "answer_score": per_primitive.get("score"),
+                    "answer_noul": per_primitive.get("noul"),
                 }
-
-                # Convenience mirror of the Choice answer if present.
-                if isinstance(answers, dict) and QUESTION_ID in answers:
-                    result["answer"] = answers[QUESTION_ID]
-
-                return result
             except Exception as exc:
                 last_error = exc
                 print(
@@ -140,3 +145,12 @@ class JevClient:
         raise RuntimeError(
             f"JEV call failed after {self.max_retries} retries: {last_error}"
         )
+
+
+# Keep question id constants importable for callers that still expect them.
+__all__ = [
+    "JevClient",
+    "QUESTION_ID_CHOICE",
+    "QUESTION_ID_SCORE",
+    "QUESTION_ID_NOUL",
+]

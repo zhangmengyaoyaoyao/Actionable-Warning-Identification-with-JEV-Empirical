@@ -1,0 +1,88 @@
+{
+  "source_file": "report/spotbugs/bcel/bug_0017_bcel.json",
+  "warning": {
+    "category": "DODGY_CODE",
+    "vtype": "SA_FIELD_DOUBLE_ASSIGNMENT",
+    "priority": "2",
+    "rank": "17",
+    "project": "bcel",
+    "warning_line": "this.bootstrap_arguments = bootstrap_arguments;\n",
+    "warning_method": "public BootstrapMethod(int bootstrap_method_ref, int num_bootstrap_arguments, int[] bootstrap_arguments) {\nthis.bootstrap_method_ref = bootstrap_method_ref;\nthis.bootstrap_arguments = new int[num_bootstrap_arguments];\nthis.bootstrap_arguments = bootstrap_arguments;\n}"
+  },
+  "created_at": "2026-10-24T08:45:24.121415+00:00",
+  "primitive": "choice",
+  "request": {
+    "model": "jev-latest",
+    "state": "{\n  \"category\": \"DODGY_CODE\",\n  \"vtype\": \"SA_FIELD_DOUBLE_ASSIGNMENT\",\n  \"priority\": \"2\",\n  \"rank\": \"17\",\n  \"project\": \"bcel\",\n  \"warning_line\": \"this.bootstrap_arguments = bootstrap_arguments;\\n\",\n  \"warning_method\": \"public BootstrapMethod(int bootstrap_method_ref, int num_bootstrap_arguments, int[] bootstrap_arguments) {\\nthis.bootstrap_method_ref = bootstrap_method_ref;\\nthis.bootstrap_arguments = new int[num_bootstrap_arguments];\\nthis.bootstrap_arguments = bootstrap_arguments;\\n}\"\n}",
+    "questions": {
+      "actionability_choice": {
+        "type": "choice",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Select exactly one option.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Rate the warning on the ordered scale from unactionable to actionable.",
+        "criteria": [
+          "A false positive, intentional pattern, or warning that does not require a fix.",
+          "A genuine defect or risk that warrants developer attention and a code change."
+        ]
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Is this warning actionable?",
+        "criteria": {
+          "true": "A genuine defect or risk that warrants developer attention and a code change.",
+          "false": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "usage": {
+      "input_tokens": 735,
+      "output_tokens": 81
+    },
+    "answers": {
+      "actionability_choice": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.74,
+        "probabilities": {
+          "actionable": 0.87,
+          "unactionable": 0.13
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "score": 0.86,
+        "confidence": 0.72,
+        "legend": {
+          "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "1": "A genuine defect or risk that warrants developer attention and a code change."
+        },
+        "probabilities": {
+          "0": 0.14,
+          "1": 0.86
+        }
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "noul": 0.77
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.74,
+    "probabilities": {
+      "actionable": 0.87,
+      "unactionable": 0.13
+    }
+  }
+}

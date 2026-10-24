@@ -1,0 +1,83 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0072_dbcp.json",
+  "warning": {
+    "category": "SECURITY",
+    "vtype": "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING",
+    "priority": "3",
+    "rank": "15",
+    "project": "dbcp",
+    "warning_line": "conn.validate(validationQuery, validationQueryTimeoutDuration);\n",
+    "warning_method": "public void validateConnection(final PoolableConnection conn) throws SQLException {\nif (conn.isClosed()) {\nthrow new SQLException(\"validateConnection: connection closed\");\n}\nconn.validate(validationQuery, validationQueryTimeoutDuration);\n}"
+  },
+  "created_at": "2026-10-24T08:44:55.286870+00:00",
+  "primitive": "noul",
+  "request": {
+    "model": "jev-latest",
+    "state": "{\n  \"category\": \"SECURITY\",\n  \"vtype\": \"SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING\",\n  \"priority\": \"3\",\n  \"rank\": \"15\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"conn.validate(validationQuery, validationQueryTimeoutDuration);\\n\",\n  \"warning_method\": \"public void validateConnection(final PoolableConnection conn) throws SQLException {\\nif (conn.isClosed()) {\\nthrow new SQLException(\\\"validateConnection: connection closed\\\");\\n}\\nconn.validate(validationQuery, validationQueryTimeoutDuration);\\n}\"\n}",
+    "questions": {
+      "actionability_choice": {
+        "type": "choice",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Select exactly one option.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Rate the warning on the ordered scale from unactionable to actionable.",
+        "criteria": [
+          "A false positive, intentional pattern, or warning that does not require a fix.",
+          "A genuine defect or risk that warrants developer attention and a code change."
+        ]
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Is this warning actionable?",
+        "criteria": {
+          "true": "A genuine defect or risk that warrants developer attention and a code change.",
+          "false": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "usage": {
+      "input_tokens": 761,
+      "output_tokens": 82
+    },
+    "answers": {
+      "actionability_choice": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.72,
+        "probabilities": {
+          "actionable": 0.14,
+          "unactionable": 0.86
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "score": 0.17,
+        "confidence": 0.66,
+        "legend": {
+          "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "1": "A genuine defect or risk that warrants developer attention and a code change."
+        },
+        "probabilities": {
+          "0": 0.83,
+          "1": 0.17
+        }
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "noul": 0.23
+      }
+    }
+  },
+  "answer": {
+    "type": "noul",
+    "noul": 0.23
+  }
+}

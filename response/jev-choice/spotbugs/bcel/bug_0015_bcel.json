@@ -1,0 +1,88 @@
+{
+  "source_file": "report/spotbugs/bcel/bug_0015_bcel.json",
+  "warning": {
+    "category": "BAD_PRACTICE",
+    "vtype": "CN_IDIOM_NO_SUPER_CALL",
+    "priority": "2",
+    "rank": "16",
+    "project": "bcel",
+    "warning_line": "OperandStack newstack = new OperandStack(this.maxStack);\n@SuppressWarnings(\"unchecked\") \nfinal ArrayList<Type> clone = (ArrayList<Type>) this.stack.clone();\nnewstack.stack = clone;\nreturn newstack;\n",
+    "warning_method": "@Override\npublic Object clone() {\nOperandStack newstack = new OperandStack(this.maxStack);\n@SuppressWarnings(\"unchecked\")\nfinal ArrayList<Type> clone = (ArrayList<Type>) this.stack.clone();\nnewstack.stack = clone;\nreturn newstack;\n}"
+  },
+  "created_at": "2026-10-24T08:45:23.543026+00:00",
+  "primitive": "choice",
+  "request": {
+    "model": "jev-latest",
+    "state": "{\n  \"category\": \"BAD_PRACTICE\",\n  \"vtype\": \"CN_IDIOM_NO_SUPER_CALL\",\n  \"priority\": \"2\",\n  \"rank\": \"16\",\n  \"project\": \"bcel\",\n  \"warning_line\": \"OperandStack newstack = new OperandStack(this.maxStack);\\n@SuppressWarnings(\\\"unchecked\\\") \\nfinal ArrayList<Type> clone = (ArrayList<Type>) this.stack.clone();\\nnewstack.stack = clone;\\nreturn newstack;\\n\",\n  \"warning_method\": \"@Override\\npublic Object clone() {\\nOperandStack newstack = new OperandStack(this.maxStack);\\n@SuppressWarnings(\\\"unchecked\\\")\\nfinal ArrayList<Type> clone = (ArrayList<Type>) this.stack.clone();\\nnewstack.stack = clone;\\nreturn newstack;\\n}\"\n}",
+    "questions": {
+      "actionability_choice": {
+        "type": "choice",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Select exactly one option.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Rate the warning on the ordered scale from unactionable to actionable.",
+        "criteria": [
+          "A false positive, intentional pattern, or warning that does not require a fix.",
+          "A genuine defect or risk that warrants developer attention and a code change."
+        ]
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Is this warning actionable?",
+        "criteria": {
+          "true": "A genuine defect or risk that warrants developer attention and a code change.",
+          "false": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "usage": {
+      "input_tokens": 818,
+      "output_tokens": 81
+    },
+    "answers": {
+      "actionability_choice": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.26,
+        "probabilities": {
+          "actionable": 0.63,
+          "unactionable": 0.37
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "score": 0.63,
+        "confidence": 0.26,
+        "legend": {
+          "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "1": "A genuine defect or risk that warrants developer attention and a code change."
+        },
+        "probabilities": {
+          "0": 0.37,
+          "1": 0.63
+        }
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "noul": 0.58
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.26,
+    "probabilities": {
+      "actionable": 0.63,
+      "unactionable": 0.37
+    }
+  }
+}

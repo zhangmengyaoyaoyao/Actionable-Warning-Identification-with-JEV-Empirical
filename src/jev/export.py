@@ -1,36 +1,70 @@
-"""Export JEV Choice results to Excel and compare them with manual labels."""
+"""Export JEV Choice / Score / Noul results to Excel and compare with manual labels."""
 
 import csv
 import json
 import os
 import re
 
+from src.jev.questions import PRIMITIVE_DIRS
+
 BUG_INDEX = re.compile(r"bug_(\d+)_")
+SCORE_ACTIONABLE_THRESHOLD = 0.5
+NOUL_ACTIONABLE_THRESHOLD = 0.5
 
 
-def compare_choice(choice, groundtruth):
-    """Map a JEV choice and a manual label onto a confusion-matrix cell.
+def compare_prediction(prediction, groundtruth):
+    """Map a binary prediction and a manual label onto a confusion-matrix cell.
 
     Manual labels follow the existing Java/C datasets:
     TP / True  = actionable warning
     FP / False = unactionable warning (analyzer false positive)
     """
-    choice = str(choice or "").strip().lower()
+    prediction = str(prediction or "").strip().lower()
     label = str(groundtruth or "").strip()
     positive = label in {"TP", "True", "true"}
     negative = label in {"FP", "False", "false"}
 
-    if choice == "unknown":
-        return "unknown"
-    if choice not in {"actionable", "unactionable"} or not (positive or negative):
+    if prediction not in {"actionable", "unactionable"} or not (positive or negative):
         return "error"
-    if choice == "actionable" and positive:
+    if prediction == "actionable" and positive:
         return "TP"
-    if choice == "unactionable" and negative:
+    if prediction == "unactionable" and negative:
         return "TN"
-    if choice == "actionable" and negative:
+    if prediction == "actionable" and negative:
         return "FP"
     return "FN"
+
+
+# Backward-compatible alias used by older call sites / notebooks.
+compare_choice = compare_prediction
+
+
+def prediction_from_answer(primitive, answer):
+    """Map a primitive answer onto actionable / unactionable."""
+    answer = answer or {}
+    primitive = str(primitive or answer.get("type") or "").strip().lower()
+
+    if primitive == "choice":
+        choice = str(answer.get("choice") or "").strip().lower()
+        if choice in {"actionable", "unactionable"}:
+            return choice
+        return None
+
+    if primitive == "score":
+        try:
+            score = float(answer.get("score"))
+        except (TypeError, ValueError):
+            return None
+        return "actionable" if score >= SCORE_ACTIONABLE_THRESHOLD else "unactionable"
+
+    if primitive == "noul":
+        try:
+            noul = float(answer.get("noul"))
+        except (TypeError, ValueError):
+            return None
+        return "actionable" if noul >= NOUL_ACTIONABLE_THRESHOLD else "unactionable"
+
+    return None
 
 
 def _bug_index(file_name):
@@ -66,16 +100,41 @@ def _label_for(labels, index):
     raise KeyError("人工标记中没有 final_label 列")
 
 
-def _answer_fields(record):
+def _detect_primitive(model, record):
+    if record.get("primitive") in PRIMITIVE_DIRS:
+        return record["primitive"]
+    for primitive, directory in PRIMITIVE_DIRS.items():
+        if model == directory:
+            return primitive
     answer = record.get("answer") or {}
+    answer_type = str(answer.get("type") or "").strip().lower()
+    if answer_type in PRIMITIVE_DIRS:
+        return answer_type
+    if "choice" in answer:
+        return "choice"
+    if "score" in answer:
+        return "score"
+    if "noul" in answer:
+        return "noul"
+    return "choice"
+
+
+def _answer_fields(primitive, answer):
+    answer = answer or {}
     probabilities = answer.get("probabilities") or {}
-    return {
+    fields = {
+        "primitive": primitive,
+        "prediction": prediction_from_answer(primitive, answer),
         "choice": answer.get("choice"),
+        "score": answer.get("score"),
+        "noul": answer.get("noul"),
         "confidence": answer.get("confidence"),
         "prob_actionable": probabilities.get("actionable"),
         "prob_unactionable": probabilities.get("unactionable"),
-        "prob_unknown": probabilities.get("unknown"),
+        "prob_score_0": probabilities.get("0") if "0" in probabilities else probabilities.get(0),
+        "prob_score_1": probabilities.get("1") if "1" in probabilities else probabilities.get(1),
     }
+    return fields
 
 
 def _iter_result_files(model, lang, projects, tool):
@@ -119,22 +178,28 @@ def export_jev_results(model, lang, projects=None, tool="spotbugs", output_excel
         if project not in label_cache:
             label_cache[project] = _load_c_labels() if lang_name == "c" else _load_java_labels(project)
         groundtruth = _label_for(label_cache[project], _bug_index(file_name))
-        fields = _answer_fields(record)
+        primitive = _detect_primitive(model, record)
+        fields = _answer_fields(primitive, record.get("answer") or {})
         rows.append(
             {
                 "file_name": file_name,
-                "project": warning.get("project") or project,
+                "project": warning.get("project") or warning.get("Project") or project,
                 "category": warning.get("category"),
                 "vtype": warning.get("vtype"),
                 "priority": warning.get("priority"),
                 "rank": warning.get("rank"),
+                "primitive": fields["primitive"],
+                "prediction": fields["prediction"],
                 "choice": fields["choice"],
+                "score": fields["score"],
+                "noul": fields["noul"],
                 "confidence": fields["confidence"],
                 "prob_actionable": fields["prob_actionable"],
                 "prob_unactionable": fields["prob_unactionable"],
-                "prob_unknown": fields["prob_unknown"],
+                "prob_score_0": fields["prob_score_0"],
+                "prob_score_1": fields["prob_score_1"],
                 "groundtruth": groundtruth,
-                "comparison": compare_choice(fields["choice"], groundtruth),
+                "comparison": compare_prediction(fields["prediction"], groundtruth),
             }
         )
 
@@ -143,3 +208,20 @@ def export_jev_results(model, lang, projects=None, tool="spotbugs", output_excel
     frame.to_excel(output_excel, index=False)
     print(f"已写入 {len(frame)} 行到 {output_excel}")
     return output_excel
+
+
+def export_all_primitives(lang, projects=None, tool="spotbugs", output_dir=None):
+    """Export Choice / Score / Noul result directories into separate Excel files."""
+    output_dir = output_dir or os.path.join("results", "jev")
+    written = []
+    for primitive, directory in PRIMITIVE_DIRS.items():
+        output_excel = os.path.join(output_dir, f"{lang}_{directory}.xlsx")
+        path = export_jev_results(
+            model=directory,
+            lang=lang,
+            projects=projects,
+            tool=tool,
+            output_excel=output_excel,
+        )
+        written.append((primitive, path))
+    return written

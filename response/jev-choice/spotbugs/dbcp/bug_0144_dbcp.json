@@ -1,0 +1,88 @@
+{
+  "source_file": "report/spotbugs/dbcp/bug_0144_dbcp.json",
+  "warning": {
+    "category": "MALICIOUS_CODE",
+    "vtype": "EI_EXPOSE_REP",
+    "priority": "2",
+    "rank": "18",
+    "project": "dbcp",
+    "warning_line": "return userPassword;\n",
+    "warning_method": "public char[] getPasswordCharArray() {\nreturn userPassword;\n}"
+  },
+  "created_at": "2026-10-24T08:45:13.870703+00:00",
+  "primitive": "choice",
+  "request": {
+    "model": "jev-latest",
+    "state": "{\n  \"category\": \"MALICIOUS_CODE\",\n  \"vtype\": \"EI_EXPOSE_REP\",\n  \"priority\": \"2\",\n  \"rank\": \"18\",\n  \"project\": \"dbcp\",\n  \"warning_line\": \"return userPassword;\\n\",\n  \"warning_method\": \"public char[] getPasswordCharArray() {\\nreturn userPassword;\\n}\"\n}",
+    "questions": {
+      "actionability_choice": {
+        "type": "choice",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Select exactly one option.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Rate the warning on the ordered scale from unactionable to actionable.",
+        "criteria": [
+          "A false positive, intentional pattern, or warning that does not require a fix.",
+          "A genuine defect or risk that warrants developer attention and a code change."
+        ]
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "instructions": "You are an expert in static analysis warning classification. Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix. Is this warning actionable?",
+        "criteria": {
+          "true": "A genuine defect or risk that warrants developer attention and a code change.",
+          "false": "A false positive, intentional pattern, or warning that does not require a fix."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "usage": {
+      "input_tokens": 695,
+      "output_tokens": 81
+    },
+    "answers": {
+      "actionability_choice": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.86,
+        "probabilities": {
+          "actionable": 0.93,
+          "unactionable": 0.07
+        }
+      },
+      "actionability_score": {
+        "type": "score",
+        "score": 0.91,
+        "confidence": 0.82,
+        "legend": {
+          "0": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "1": "A genuine defect or risk that warrants developer attention and a code change."
+        },
+        "probabilities": {
+          "0": 0.09,
+          "1": 0.91
+        }
+      },
+      "actionability_noul": {
+        "type": "noul",
+        "noul": 0.8
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.86,
+    "probabilities": {
+      "actionable": 0.93,
+      "unactionable": 0.07
+    }
+  }
+}
