@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0023_apr.json",
+  "warning": {
+    "Project": "apr",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "tables/apr_tables.c",
+    "message": "Offset added: 128 Size: [0, +oo].",
+    "warning_function_name": "apr_table_cat",
+    "warning_line": "memcpy(t->index_first,s->index_first,sizeof(int) * TABLE_HASH_SIZE);",
+    "warning_context": "static void apr_table_cat(apr_table_t *t, const apr_table_t *s)\n{\n    const int n = t->a.nelts;\n    register int idx;\n\n    apr_array_cat(&t->a,&s->a);\n\n    if (n == 0) {\n        memcpy(t->index_first,s->index_first,sizeof(int) * TABLE_HASH_SIZE);\n        memcpy(t->index_last, s->index_last, sizeof(int) * TABLE_HASH_SIZE);\n        t->index_initialized = s->index_initialized;\n        return;\n    }\n\n    for (idx = 0; idx < TABLE_HASH_SIZE; ++idx) {\n        if (TABLE_INDEX_IS_INITIALIZED(s, idx)) {\n            t->index_last[idx] = s->index_last[idx] + n;\n            if (!TABLE_INDEX_IS_INITIALIZED(t, idx)) {\n                t->index_first[idx] = s->index_first[idx] + n;\n            }\n        }\n    }\n\n    t->index_initialized |= s->index_initialized;\n}\n"
+  },
+  "created_at": "2026-10-17T14:58:39.271273+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"apr\",\n  \"Tool\": \"Infer\",\n  \"category\": \"BUFFER_OVERRUN_L3\",\n  \"file\": \"tables/apr_tables.c\",\n  \"message\": \"Offset added: 128 Size: [0, +oo].\",\n  \"warning_function_name\": \"apr_table_cat\",\n  \"warning_line\": \"memcpy(t->index_first,s->index_first,sizeof(int) * TABLE_HASH_SIZE);\",\n  \"warning_context\": \"static void apr_table_cat(apr_table_t *t, const apr_table_t *s)\\n{\\n    const int n = t->a.nelts;\\n    register int idx;\\n\\n    apr_array_cat(&t->a,&s->a);\\n\\n    if (n == 0) {\\n        memcpy(t->index_first,s->index_first,sizeof(int) * TABLE_HASH_SIZE);\\n        memcpy(t->index_last, s->index_last, sizeof(int) * TABLE_HASH_SIZE);\\n        t->index_initialized = s->index_initialized;\\n        return;\\n    }\\n\\n    for (idx = 0; idx < TABLE_HASH_SIZE; ++idx) {\\n        if (TABLE_INDEX_IS_INITIALIZED(s, idx)) {\\n            t->index_last[idx] = s->index_last[idx] + n;\\n            if (!TABLE_INDEX_IS_INITIALIZED(t, idx)) {\\n                t->index_first[idx] = s->index_first[idx] + n;\\n            }\\n        }\\n    }\\n\\n    t->index_initialized |= s->index_initialized;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 747,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.49,
+        "probabilities": {
+          "actionable": 0.27,
+          "unactionable": 0.66,
+          "unknown": 0.07
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.49,
+    "probabilities": {
+      "actionable": 0.27,
+      "unactionable": 0.66,
+      "unknown": 0.07
+    }
+  }
+}

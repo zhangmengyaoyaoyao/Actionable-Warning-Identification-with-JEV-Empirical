@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0008_apr.json",
+  "warning": {
+    "Project": "apr",
+    "Tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "file_io/unix/filedup.c",
+    "message": "pointer `*new_file` last assigned on line 144 could be null and is dereferenced at line 145, column 5.",
+    "warning_function_name": "apr_file_setaside",
+    "warning_line": "(*new_file)->pool = p;",
+    "warning_context": "APR_DECLARE(apr_status_t) apr_file_setaside(apr_file_t **new_file,\n                                            apr_file_t *old_file,\n                                            apr_pool_t *p)\n{\n    *new_file = (apr_file_t *)apr_pmemdup(p, old_file, sizeof(apr_file_t));\n    (*new_file)->pool = p;\n    if (old_file->buffered) {\n        (*new_file)->buffer = apr_palloc(p, old_file->bufsize);\n        (*new_file)->bufsize = old_file->bufsize;\n        if (old_file->direction == 1) {\n            memcpy((*new_file)->buffer, old_file->buffer, old_file->bufpos);\n        }\n        else {\n            memcpy((*new_file)->buffer, old_file->buffer, old_file->dataRead);\n        }\n#if APR_HAS_THREADS\n        if (old_file->thlock) {\n            apr_thread_mutex_create(&((*new_file)->thlock),\n                                    APR_THREAD_MUTEX_DEFAULT, p);\n            apr_thread_mutex_destroy(old_file->thlock);\n        }\n#endif /* APR_HAS_THREADS */\n    }\n    if (old_file->fname) {\n        (*new_file)->fname = apr_pstrdup(p, old_file->fname);\n    }\n    if (!(old_file->flags & APR_FOPEN_NOCLEANUP)) {\n        apr_pool_cleanup_register(p, (void *)(*new_file), \n                                  apr_unix_file_cleanup,\n                                  ((*new_file)->flags & APR_INHERIT)\n                                     ? apr_pool_cleanup_null\n                                     : apr_unix_child_file_cleanup);\n    }\n\n    old_file->filedes = -1;\n    apr_pool_cleanup_kill(old_file->pool, (void *)old_file,\n                          apr_unix_file_cleanup);\n#ifndef WAITIO_USES_POLL\n    (*new_file)->pollset = NULL;\n#endif\n    return APR_SUCCESS;\n}\n"
+  },
+  "created_at": "2026-10-17T14:58:33.237906+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"apr\",\n  \"Tool\": \"Infer\",\n  \"category\": \"NULL_DEREFERENCE\",\n  \"file\": \"file_io/unix/filedup.c\",\n  \"message\": \"pointer `*new_file` last assigned on line 144 could be null and is dereferenced at line 145, column 5.\",\n  \"warning_function_name\": \"apr_file_setaside\",\n  \"warning_line\": \"(*new_file)->pool = p;\",\n  \"warning_context\": \"APR_DECLARE(apr_status_t) apr_file_setaside(apr_file_t **new_file,\\n                                            apr_file_t *old_file,\\n                                            apr_pool_t *p)\\n{\\n    *new_file = (apr_file_t *)apr_pmemdup(p, old_file, sizeof(apr_file_t));\\n    (*new_file)->pool = p;\\n    if (old_file->buffered) {\\n        (*new_file)->buffer = apr_palloc(p, old_file->bufsize);\\n        (*new_file)->bufsize = old_file->bufsize;\\n        if (old_file->direction == 1) {\\n            memcpy((*new_file)->buffer, old_file->buffer, old_file->bufpos);\\n        }\\n        else {\\n            memcpy((*new_file)->buffer, old_file->buffer, old_file->dataRead);\\n        }\\n#if APR_HAS_THREADS\\n        if (old_file->thlock) {\\n            apr_thread_mutex_create(&((*new_file)->thlock),\\n                                    APR_THREAD_MUTEX_DEFAULT, p);\\n            apr_thread_mutex_destroy(old_file->thlock);\\n        }\\n#endif /* APR_HAS_THREADS */\\n    }\\n    if (old_file->fname) {\\n        (*new_file)->fname = apr_pstrdup(p, old_file->fname);\\n    }\\n    if (!(old_file->flags & APR_FOPEN_NOCLEANUP)) {\\n        apr_pool_cleanup_register(p, (void *)(*new_file), \\n                                  apr_unix_file_cleanup,\\n                                  ((*new_file)->flags & APR_INHERIT)\\n                                     ? apr_pool_cleanup_null\\n                                     : apr_unix_child_file_cleanup);\\n    }\\n\\n    old_file->filedes = -1;\\n    apr_pool_cleanup_kill(old_file->pool, (void *)old_file,\\n                          apr_unix_file_cleanup);\\n#ifndef WAITIO_USES_POLL\\n    (*new_file)->pollset = NULL;\\n#endif\\n    return APR_SUCCESS;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 950,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.45,
+        "probabilities": {
+          "actionable": 0.63,
+          "unactionable": 0.34,
+          "unknown": 0.03
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.45,
+    "probabilities": {
+      "actionable": 0.63,
+      "unactionable": 0.34,
+      "unknown": 0.03
+    }
+  }
+}

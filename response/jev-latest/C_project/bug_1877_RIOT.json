@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1877_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Cppcheck",
+    "category": "ctuArrayIndex",
+    "file": "sys/hashes/cmac.c",
+    "message": "Array index out of bounds; 'x' buffer size is 0 and it is accessed at offset 15.",
+    "warning_function_name": "eftshift(u",
+    "warning_line": "y[15] = x[15] << 1;",
+    "warning_context": "static void _leftshift(uint8_t *x, uint8_t *y)\n{\n    for (unsigned i = 0; i < 15; i++) {\n        y[i] = (x[i] << 1) | (x[i + 1] >> 7);\n    }\n    y[15] = x[15] << 1;\n}\n"
+  },
+  "created_at": "2026-10-17T15:12:14.700522+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"ctuArrayIndex\",\n  \"file\": \"sys/hashes/cmac.c\",\n  \"message\": \"Array index out of bounds; 'x' buffer size is 0 and it is accessed at offset 15.\",\n  \"warning_function_name\": \"eftshift(u\",\n  \"warning_line\": \"y[15] = x[15] << 1;\",\n  \"warning_context\": \"static void _leftshift(uint8_t *x, uint8_t *y)\\n{\\n    for (unsigned i = 0; i < 15; i++) {\\n        y[i] = (x[i] << 1) | (x[i + 1] >> 7);\\n    }\\n    y[15] = x[15] << 1;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 608,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.27,
+        "probabilities": {
+          "actionable": 0.37,
+          "unactionable": 0.51,
+          "unknown": 0.12
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.27,
+    "probabilities": {
+      "actionable": 0.37,
+      "unactionable": 0.51,
+      "unknown": 0.12
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0075_bash.json",
+  "warning": {
+    "Project": "bash",
+    "Tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "lib/malloc/stats.c",
+    "message": "Uninitialized variable: fname",
+    "warning_function_name": "_imalloc_fopen",
+    "warning_line": "fp = fopen (fname, \"w\");",
+    "warning_context": "FILE *\n_imalloc_fopen (s, fn, def, defbuf, defsiz)\n     char *s;\n     char *fn;\n     char *def;\n     char *defbuf;\n     size_t defsiz;\n{\n  char fname[1024];\n  long l;\n  FILE *fp;\n\n  l = (long)getpid ();\n  if (fn == 0)\n    {\n      sprintf (defbuf, \"%s%ld\", def, l);\n      fp = fopen(defbuf, \"w\");\n    }\n  else\n    {\n      char *p, *q, *r;\n      char pidbuf[32];\n      int sp;\n\n      sprintf (pidbuf, \"%ld\", l);\n      if ((strlen (pidbuf) + strlen (fn) + 2) >= sizeof (fname))\n\treturn ((FILE *)0);\n      for (sp = 0, p = fname, q = fn; *q; )\n\t{\n\t  if (sp == 0 && *q == '%' && q[1] == 'p')\n\t    {\n\t      sp = 1;\n\t      for (r = pidbuf; *r; )\n\t\t*p++ = *r++;\n\t      q += 2;\n\t    }\n\t  else\n\t    *p++ = *q++;\n\t}\n      *p = '\\0';\n      fp = fopen (fname, \"w\");\n    }\n\n  return fp;\n}\n"
+  },
+  "created_at": "2026-10-17T14:58:57.423633+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"bash\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"uninitvar\",\n  \"file\": \"lib/malloc/stats.c\",\n  \"message\": \"Uninitialized variable: fname\",\n  \"warning_function_name\": \"_imalloc_fopen\",\n  \"warning_line\": \"fp = fopen (fname, \\\"w\\\");\",\n  \"warning_context\": \"FILE *\\n_imalloc_fopen (s, fn, def, defbuf, defsiz)\\n     char *s;\\n     char *fn;\\n     char *def;\\n     char *defbuf;\\n     size_t defsiz;\\n{\\n  char fname[1024];\\n  long l;\\n  FILE *fp;\\n\\n  l = (long)getpid ();\\n  if (fn == 0)\\n    {\\n      sprintf (defbuf, \\\"%s%ld\\\", def, l);\\n      fp = fopen(defbuf, \\\"w\\\");\\n    }\\n  else\\n    {\\n      char *p, *q, *r;\\n      char pidbuf[32];\\n      int sp;\\n\\n      sprintf (pidbuf, \\\"%ld\\\", l);\\n      if ((strlen (pidbuf) + strlen (fn) + 2) >= sizeof (fname))\\n\\treturn ((FILE *)0);\\n      for (sp = 0, p = fname, q = fn; *q; )\\n\\t{\\n\\t  if (sp == 0 && *q == '%' && q[1] == 'p')\\n\\t    {\\n\\t      sp = 1;\\n\\t      for (r = pidbuf; *r; )\\n\\t\\t*p++ = *r++;\\n\\t      q += 2;\\n\\t    }\\n\\t  else\\n\\t    *p++ = *q++;\\n\\t}\\n      *p = '\\\\0';\\n      fp = fopen (fname, \\\"w\\\");\\n    }\\n\\n  return fp;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 860,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.74,
+        "probabilities": {
+          "actionable": 0.16,
+          "unactionable": 0.83,
+          "unknown": 0.01
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.74,
+    "probabilities": {
+      "actionable": 0.16,
+      "unactionable": 0.83,
+      "unknown": 0.01
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1874_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Cppcheck",
+    "category": "ctuArrayIndex",
+    "file": "drivers/pn532/pn532.c",
+    "message": "Array index out of bounds; 'buff' buffer size is 0 and it is accessed at offset 6.",
+    "warning_function_name": "nd_rcv(p",
+    "warning_line": "int expected_cmd = buff[BUFF_CMD_START] + 1;",
+    "warning_context": "static int send_rcv(pn532_t *dev, uint8_t *buff, unsigned sendl, unsigned recvl)\n{\n    assert(dev != NULL);\n\n    int expected_cmd = buff[BUFF_CMD_START] + 1;\n\n    if (send_check_ack(dev, buff, sendl + 1)) {\n        return 0;\n    }\n\n    recvl += 1; /* cmd response */\n    return read_command(dev, buff, recvl, expected_cmd);\n}\n"
+  },
+  "created_at": "2026-10-17T15:12:13.665297+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"ctuArrayIndex\",\n  \"file\": \"drivers/pn532/pn532.c\",\n  \"message\": \"Array index out of bounds; 'buff' buffer size is 0 and it is accessed at offset 6.\",\n  \"warning_function_name\": \"nd_rcv(p\",\n  \"warning_line\": \"int expected_cmd = buff[BUFF_CMD_START] + 1;\",\n  \"warning_context\": \"static int send_rcv(pn532_t *dev, uint8_t *buff, unsigned sendl, unsigned recvl)\\n{\\n    assert(dev != NULL);\\n\\n    int expected_cmd = buff[BUFF_CMD_START] + 1;\\n\\n    if (send_check_ack(dev, buff, sendl + 1)) {\\n        return 0;\\n    }\\n\\n    recvl += 1; /* cmd response */\\n    return read_command(dev, buff, recvl, expected_cmd);\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 637,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.18,
+        "probabilities": {
+          "actionable": 0.34,
+          "unactionable": 0.45,
+          "unknown": 0.21
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.18,
+    "probabilities": {
+      "actionable": 0.34,
+      "unactionable": 0.45,
+      "unknown": 0.21
+    }
+  }
+}

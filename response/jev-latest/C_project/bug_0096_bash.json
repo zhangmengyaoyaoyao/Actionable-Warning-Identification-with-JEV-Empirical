@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0096_bash.json",
+  "warning": {
+    "Project": "bash",
+    "Tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "make_cmd.c",
+    "message": "pointer `temp` last assigned on line 85 could be null and is dereferenced at line 86, column 3.",
+    "warning_function_name": "alloc_word_desc",
+    "warning_line": "temp->flags = 0;",
+    "warning_context": "WORD_DESC *\nalloc_word_desc ()\n{\n  WORD_DESC *temp;\n\n  ocache_alloc (wdcache, WORD_DESC, temp);\n  temp->flags = 0;\n  temp->word = 0;\n  return temp;\n}\n"
+  },
+  "created_at": "2026-10-17T14:59:03.783788+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"bash\",\n  \"Tool\": \"Infer\",\n  \"category\": \"NULL_DEREFERENCE\",\n  \"file\": \"make_cmd.c\",\n  \"message\": \"pointer `temp` last assigned on line 85 could be null and is dereferenced at line 86, column 3.\",\n  \"warning_function_name\": \"alloc_word_desc\",\n  \"warning_line\": \"temp->flags = 0;\",\n  \"warning_context\": \"WORD_DESC *\\nalloc_word_desc ()\\n{\\n  WORD_DESC *temp;\\n\\n  ocache_alloc (wdcache, WORD_DESC, temp);\\n  temp->flags = 0;\\n  temp->word = 0;\\n  return temp;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 569,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.22,
+        "probabilities": {
+          "actionable": 0.42,
+          "unactionable": 0.48,
+          "unknown": 0.1
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.22,
+    "probabilities": {
+      "actionable": 0.42,
+      "unactionable": 0.48,
+      "unknown": 0.1
+    }
+  }
+}

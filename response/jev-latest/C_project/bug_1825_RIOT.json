@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1825_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Cppcheck",
+    "category": "arrayIndexOutOfBoundsCond",
+    "file": "cpu/atmega_common/periph/gpio.c",
+    "message": "Either the condition 'int_num<4' is redundant or the array 'config[2]' is accessed at index 4, which is out of bounds.",
+    "warning_function_name": "pio_init_int(",
+    "warning_line": "config[int_num].cb = cb;",
+    "warning_context": "int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,\n                  gpio_cb_t cb, void *arg)\n{\n    int8_t int_num = _int_num(pin);\n\n    /* mode not supported */\n    if ((mode != GPIO_IN) && (mode != GPIO_IN_PU)) {\n        return -1;\n    }\n\n    /* not a valid interrupt pin. Set as pcint instead if pcints are enabled */\n    if (int_num < 0) {\n#ifdef ENABLE_PCINT\n        /* If pin change interrupts are enabled, enable mask and interrupt */\n        return pcint_init_int(pin, mode, flank, cb, arg);\n#else\n        return -1;\n#endif /* ENABLE_PCINT */\n    }\n\n    /* flank not supported */\n    if (flank > GPIO_RISING) {\n        return -1;\n    }\n\n    gpio_init(pin, mode);\n\n    /* clear global interrupt flag */\n    cli();\n\n    /* enable interrupt number int_num */\n    EIFR |= (1 << int_num);\n    EIMSK |= (1 << int_num);\n\n    /* apply flank to interrupt number int_num */\n    if (int_num < 4) {\n        EICRA &= ~(0x3 << (int_num * 2));\n        EICRA |= (flank << (int_num * 2));\n    }\n    #if defined(EICRB)\n    else {\n        EICRB &= ~(0x3 << ((int_num % 4) * 2));\n        EICRB |= (flank << ((int_num % 4) * 2));\n    }\n    #endif\n\n    /* set callback */\n    config[int_num].cb = cb;\n    config[int_num].arg = arg;\n\n    /* set global interrupt flag */\n    sei();\n\n    return 0;\n}\n"
+  },
+  "created_at": "2026-10-17T15:11:52.164813+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"arrayIndexOutOfBoundsCond\",\n  \"file\": \"cpu/atmega_common/periph/gpio.c\",\n  \"message\": \"Either the condition 'int_num<4' is redundant or the array 'config[2]' is accessed at index 4, which is out of bounds.\",\n  \"warning_function_name\": \"pio_init_int(\",\n  \"warning_line\": \"config[int_num].cb = cb;\",\n  \"warning_context\": \"int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,\\n                  gpio_cb_t cb, void *arg)\\n{\\n    int8_t int_num = _int_num(pin);\\n\\n    /* mode not supported */\\n    if ((mode != GPIO_IN) && (mode != GPIO_IN_PU)) {\\n        return -1;\\n    }\\n\\n    /* not a valid interrupt pin. Set as pcint instead if pcints are enabled */\\n    if (int_num < 0) {\\n#ifdef ENABLE_PCINT\\n        /* If pin change interrupts are enabled, enable mask and interrupt */\\n        return pcint_init_int(pin, mode, flank, cb, arg);\\n#else\\n        return -1;\\n#endif /* ENABLE_PCINT */\\n    }\\n\\n    /* flank not supported */\\n    if (flank > GPIO_RISING) {\\n        return -1;\\n    }\\n\\n    gpio_init(pin, mode);\\n\\n    /* clear global interrupt flag */\\n    cli();\\n\\n    /* enable interrupt number int_num */\\n    EIFR |= (1 << int_num);\\n    EIMSK |= (1 << int_num);\\n\\n    /* apply flank to interrupt number int_num */\\n    if (int_num < 4) {\\n        EICRA &= ~(0x3 << (int_num * 2));\\n        EICRA |= (flank << (int_num * 2));\\n    }\\n    #if defined(EICRB)\\n    else {\\n        EICRB &= ~(0x3 << ((int_num % 4) * 2));\\n        EICRB |= (flank << ((int_num % 4) * 2));\\n    }\\n    #endif\\n\\n    /* set callback */\\n    config[int_num].cb = cb;\\n    config[int_num].arg = arg;\\n\\n    /* set global interrupt flag */\\n    sei();\\n\\n    return 0;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 972,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.31,
+        "probabilities": {
+          "actionable": 0.54,
+          "unactionable": 0.34,
+          "unknown": 0.12
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.31,
+    "probabilities": {
+      "actionable": 0.54,
+      "unactionable": 0.34,
+      "unknown": 0.12
+    }
+  }
+}

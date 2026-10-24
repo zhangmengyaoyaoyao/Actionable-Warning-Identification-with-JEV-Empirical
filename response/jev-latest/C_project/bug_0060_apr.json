@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0060_apr.json",
+  "warning": {
+    "Project": "apr",
+    "Tool": "CSA",
+    "category": "core.UndefinedBinaryOperatorResult",
+    "file": "file_io/unix/filestat.c",
+    "message": "The left operand of '/' is a garbage value",
+    "warning_function_name": "apr_file_mtime_set",
+    "warning_line": "tvp[0].tv_sec = apr_time_sec(finfo.atime);",
+    "warning_context": "APR_DECLARE(apr_status_t) apr_file_mtime_set(const char *fname,\n                                              apr_time_t mtime,\n                                              apr_pool_t *pool)\n{\n    apr_status_t status;\n    apr_finfo_t finfo;\n\n    status = apr_stat(&finfo, fname, APR_FINFO_ATIME, pool);\n    if (status) {\n        return status;\n    }\n\n#ifdef HAVE_UTIMES\n    {\n      struct timeval tvp[2];\n    \n      tvp[0].tv_sec = apr_time_sec(finfo.atime);\n      tvp[0].tv_usec = apr_time_usec(finfo.atime);\n      tvp[1].tv_sec = apr_time_sec(mtime);\n      tvp[1].tv_usec = apr_time_usec(mtime);\n      \n      if (utimes(fname, tvp) == -1) {\n        return errno;\n      }\n    }\n#elif defined(HAVE_UTIME)\n    {\n      struct utimbuf buf;\n      \n      buf.actime = (time_t) (finfo.atime / APR_USEC_PER_SEC);\n      buf.modtime = (time_t) (mtime / APR_USEC_PER_SEC);\n      \n      if (utime(fname, &buf) == -1) {\n        return errno;\n      }\n    }\n#else\n    return APR_ENOTIMPL;\n#endif\n\n    return APR_SUCCESS;\n}\n"
+  },
+  "created_at": "2026-10-17T14:58:52.678357+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"apr\",\n  \"Tool\": \"CSA\",\n  \"category\": \"core.UndefinedBinaryOperatorResult\",\n  \"file\": \"file_io/unix/filestat.c\",\n  \"message\": \"The left operand of '/' is a garbage value\",\n  \"warning_function_name\": \"apr_file_mtime_set\",\n  \"warning_line\": \"tvp[0].tv_sec = apr_time_sec(finfo.atime);\",\n  \"warning_context\": \"APR_DECLARE(apr_status_t) apr_file_mtime_set(const char *fname,\\n                                              apr_time_t mtime,\\n                                              apr_pool_t *pool)\\n{\\n    apr_status_t status;\\n    apr_finfo_t finfo;\\n\\n    status = apr_stat(&finfo, fname, APR_FINFO_ATIME, pool);\\n    if (status) {\\n        return status;\\n    }\\n\\n#ifdef HAVE_UTIMES\\n    {\\n      struct timeval tvp[2];\\n    \\n      tvp[0].tv_sec = apr_time_sec(finfo.atime);\\n      tvp[0].tv_usec = apr_time_usec(finfo.atime);\\n      tvp[1].tv_sec = apr_time_sec(mtime);\\n      tvp[1].tv_usec = apr_time_usec(mtime);\\n      \\n      if (utimes(fname, tvp) == -1) {\\n        return errno;\\n      }\\n    }\\n#elif defined(HAVE_UTIME)\\n    {\\n      struct utimbuf buf;\\n      \\n      buf.actime = (time_t) (finfo.atime / APR_USEC_PER_SEC);\\n      buf.modtime = (time_t) (mtime / APR_USEC_PER_SEC);\\n      \\n      if (utime(fname, &buf) == -1) {\\n        return errno;\\n      }\\n    }\\n#else\\n    return APR_ENOTIMPL;\\n#endif\\n\\n    return APR_SUCCESS;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 837,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.59,
+        "probabilities": {
+          "actionable": 0.23,
+          "unactionable": 0.73,
+          "unknown": 0.04
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.59,
+    "probabilities": {
+      "actionable": 0.23,
+      "unactionable": 0.73,
+      "unknown": 0.04
+    }
+  }
+}

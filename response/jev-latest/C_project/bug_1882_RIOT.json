@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1882_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Infer",
+    "category": "Buffer Overrun L3",
+    "file": "sys/net/network_layer/ipv6/addr/ipv6_addr.c",
+    "message": "Offset: [-1, 15] Size: 16.",
+    "warning_function_name": "ipv6_addr_init_iid",
+    "warning_line": "out->u8[pos - 1] &= mask;",
+    "warning_context": "void ipv6_addr_init_iid(ipv6_addr_t *out, const uint8_t *iid, uint8_t bits)\n{\n    uint8_t unaligned_bits, bytes, pos;\n\n    if (bits > 128) {\n        bits = 128;\n    }\n\n    unaligned_bits = bits % 8;\n    bytes = bits / 8;\n    pos = (IPV6_ADDR_BIT_LEN / 8) - bytes;\n\n    if (unaligned_bits) {\n        uint8_t mask = 0xff << unaligned_bits;\n        out->u8[pos - 1] &= mask;\n        out->u8[pos - 1] |= (*iid & ~mask);\n        iid++;\n    }\n\n    memcpy(&(out->u8[pos]), iid, bytes);\n}\n"
+  },
+  "created_at": "2026-10-17T15:12:16.329018+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Infer\",\n  \"category\": \"Buffer Overrun L3\",\n  \"file\": \"sys/net/network_layer/ipv6/addr/ipv6_addr.c\",\n  \"message\": \"Offset: [-1, 15] Size: 16.\",\n  \"warning_function_name\": \"ipv6_addr_init_iid\",\n  \"warning_line\": \"out->u8[pos - 1] &= mask;\",\n  \"warning_context\": \"void ipv6_addr_init_iid(ipv6_addr_t *out, const uint8_t *iid, uint8_t bits)\\n{\\n    uint8_t unaligned_bits, bytes, pos;\\n\\n    if (bits > 128) {\\n        bits = 128;\\n    }\\n\\n    unaligned_bits = bits % 8;\\n    bytes = bits / 8;\\n    pos = (IPV6_ADDR_BIT_LEN / 8) - bytes;\\n\\n    if (unaligned_bits) {\\n        uint8_t mask = 0xff << unaligned_bits;\\n        out->u8[pos - 1] &= mask;\\n        out->u8[pos - 1] |= (*iid & ~mask);\\n        iid++;\\n    }\\n\\n    memcpy(&(out->u8[pos]), iid, bytes);\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 707,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.45,
+        "probabilities": {
+          "actionable": 0.63,
+          "unactionable": 0.34,
+          "unknown": 0.03
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.45,
+    "probabilities": {
+      "actionable": 0.63,
+      "unactionable": 0.34,
+      "unknown": 0.03
+    }
+  }
+}

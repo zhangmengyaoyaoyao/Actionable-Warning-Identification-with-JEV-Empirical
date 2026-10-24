@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1904_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Infer",
+    "category": "Buffer Overrun L3",
+    "file": "sys/shell/commands/sc_ccnl.c",
+    "message": "Offset: [0, 6] Size: [0, 7] by call to `ccnl_fib_rem_entry`.",
+    "warning_function_name": "_ccnl_fib",
+    "warning_line": "int res = ccnl_fib_rem_entry(&ccnl_relay, prefix, NULL);",
+    "warning_context": "int _ccnl_fib(int argc, char **argv)\n{\n    if (argc < 2) {\n        ccnl_fib_show(&ccnl_relay);\n    }\n    else if ((argc == 3) && (strncmp(argv[1], \"del\", 3) == 0)) {\n        int suite = CCNL_SUITE_NDNTLV;\n        if (strchr(argv[2], '/')) {\n            struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[2], suite, NULL);\n            if (!prefix) {\n                puts(\"Error: prefix could not be created!\");\n                return -1;\n            }\n            int res = ccnl_fib_rem_entry(&ccnl_relay, prefix, NULL);\n            ccnl_prefix_free(prefix);\n            return res;\n        }\n        else {\n            struct ccnl_face_s *face = _intern_face_get(argv[2]);\n            if (face == NULL) {\n                printf(\"There is no face for address %s\\n\", argv[1]);\n                return -1;\n            }\n            int res = ccnl_fib_rem_entry(&ccnl_relay, NULL, face);\n            return res;\n        }\n    }\n    else if ((argc == 4) && (strncmp(argv[1], \"add\", 3) == 0)) {\n        if (_intern_fib_add(argv[2], argv[3]) < 0) {\n            _ccnl_fib_usage(argv[0]);\n            return -1;\n        }\n    }\n    else {\n        _ccnl_fib_usage(argv[0]);\n        return -1;\n    }\n    return 0;\n}\n"
+  },
+  "created_at": "2026-10-17T15:12:28.429516+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Infer\",\n  \"category\": \"Buffer Overrun L3\",\n  \"file\": \"sys/shell/commands/sc_ccnl.c\",\n  \"message\": \"Offset: [0, 6] Size: [0, 7] by call to `ccnl_fib_rem_entry`.\",\n  \"warning_function_name\": \"_ccnl_fib\",\n  \"warning_line\": \"int res = ccnl_fib_rem_entry(&ccnl_relay, prefix, NULL);\",\n  \"warning_context\": \"int _ccnl_fib(int argc, char **argv)\\n{\\n    if (argc < 2) {\\n        ccnl_fib_show(&ccnl_relay);\\n    }\\n    else if ((argc == 3) && (strncmp(argv[1], \\\"del\\\", 3) == 0)) {\\n        int suite = CCNL_SUITE_NDNTLV;\\n        if (strchr(argv[2], '/')) {\\n            struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[2], suite, NULL);\\n            if (!prefix) {\\n                puts(\\\"Error: prefix could not be created!\\\");\\n                return -1;\\n            }\\n            int res = ccnl_fib_rem_entry(&ccnl_relay, prefix, NULL);\\n            ccnl_prefix_free(prefix);\\n            return res;\\n        }\\n        else {\\n            struct ccnl_face_s *face = _intern_face_get(argv[2]);\\n            if (face == NULL) {\\n                printf(\\\"There is no face for address %s\\\\n\\\", argv[1]);\\n                return -1;\\n            }\\n            int res = ccnl_fib_rem_entry(&ccnl_relay, NULL, face);\\n            return res;\\n        }\\n    }\\n    else if ((argc == 4) && (strncmp(argv[1], \\\"add\\\", 3) == 0)) {\\n        if (_intern_fib_add(argv[2], argv[3]) < 0) {\\n            _ccnl_fib_usage(argv[0]);\\n            return -1;\\n        }\\n    }\\n    else {\\n        _ccnl_fib_usage(argv[0]);\\n        return -1;\\n    }\\n    return 0;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 928,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.59,
+        "probabilities": {
+          "actionable": 0.13,
+          "unactionable": 0.73,
+          "unknown": 0.14
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.59,
+    "probabilities": {
+      "actionable": 0.13,
+      "unactionable": 0.73,
+      "unknown": 0.14
+    }
+  }
+}

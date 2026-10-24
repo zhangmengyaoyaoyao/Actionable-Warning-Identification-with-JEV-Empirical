@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1860_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "sys/quad_math/ashrdi3.c",
+    "message": "Either the condition 'shift==0' is redundant or there is possible null pointer dereference: ul.",
+    "warning_function_name": "__ashrdi3",
+    "warning_line": "aa.ul[L] = (aa.ul[L] >> shift) | (aa.ul[H] << (INT_BITS - shift));",
+    "warning_context": "quad_t __ashrdi3(quad_t a, qshift_t shift)\n{\n    union uu aa;\n\n    if (shift == 0) {\n        return a;\n    }\n\n    aa.q = a;\n\n    if (shift >= INT_BITS) {\n        /*\n         * Smear bits rightward using the machine's right-shift\n         * method, whether that is sign extension or zero fill,\n         * to get the `sign word' s.  Note that shifting by\n         * INT_BITS is undefined, so we shift (INT_BITS-1),\n         * then 1 more, to get our answer.\n         */\n        /* LINTED inherits machine dependency */\n        int s = (aa.sl[H] >> (INT_BITS - 1)) >> 1;\n        /* LINTED inherits machine dependency*/\n        aa.ul[L] = aa.sl[H] >> (shift - INT_BITS);\n        aa.ul[H] = s;\n    }\n    else {\n        aa.ul[L] = (aa.ul[L] >> shift) | (aa.ul[H] << (INT_BITS - shift));\n        /* LINTED inherits machine dependency */\n        aa.sl[H] >>= shift;\n    }\n\n    return aa.q;\n}\n"
+  },
+  "created_at": "2026-10-17T15:12:08.879988+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"Null Pointer Dereference\",\n  \"file\": \"sys/quad_math/ashrdi3.c\",\n  \"message\": \"Either the condition 'shift==0' is redundant or there is possible null pointer dereference: ul.\",\n  \"warning_function_name\": \"__ashrdi3\",\n  \"warning_line\": \"aa.ul[L] = (aa.ul[L] >> shift) | (aa.ul[H] << (INT_BITS - shift));\",\n  \"warning_context\": \"quad_t __ashrdi3(quad_t a, qshift_t shift)\\n{\\n    union uu aa;\\n\\n    if (shift == 0) {\\n        return a;\\n    }\\n\\n    aa.q = a;\\n\\n    if (shift >= INT_BITS) {\\n        /*\\n         * Smear bits rightward using the machine's right-shift\\n         * method, whether that is sign extension or zero fill,\\n         * to get the `sign word' s.  Note that shifting by\\n         * INT_BITS is undefined, so we shift (INT_BITS-1),\\n         * then 1 more, to get our answer.\\n         */\\n        /* LINTED inherits machine dependency */\\n        int s = (aa.sl[H] >> (INT_BITS - 1)) >> 1;\\n        /* LINTED inherits machine dependency*/\\n        aa.ul[L] = aa.sl[H] >> (shift - INT_BITS);\\n        aa.ul[H] = s;\\n    }\\n    else {\\n        aa.ul[L] = (aa.ul[L] >> shift) | (aa.ul[H] << (INT_BITS - shift));\\n        /* LINTED inherits machine dependency */\\n        aa.sl[H] >>= shift;\\n    }\\n\\n    return aa.q;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 828,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.94,
+        "probabilities": {
+          "actionable": 0.03,
+          "unactionable": 0.96,
+          "unknown": 0.01
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.94,
+    "probabilities": {
+      "actionable": 0.03,
+      "unactionable": 0.96,
+      "unknown": 0.01
+    }
+  }
+}

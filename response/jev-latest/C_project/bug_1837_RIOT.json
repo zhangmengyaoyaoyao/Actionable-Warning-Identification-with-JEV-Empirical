@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1837_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "drivers/ccs811/ccs811.c",
+    "message": "Either the condition 'dev!=NULL' is redundant or there is possible null pointer dereference: dev.",
+    "warning_function_name": "ccs811_power_down",
+    "warning_line": "if (dev->params.wake_pin != GPIO_UNDEF) {",
+    "warning_context": "int ccs811_power_down (ccs811_t *dev)\n{\n    ASSERT_PARAM(dev != NULL);\n\n    ccs811_mode_t tmp_mode = dev->params.mode;\n    int res = ccs811_set_mode(dev, CCS811_MODE_IDLE);\n    dev->params.mode = tmp_mode;\n\n    if (dev->params.wake_pin != GPIO_UNDEF) {\n        DEBUG_DEV(\"Setting nWAKE pin high\", dev);\n        gpio_set(dev->params.wake_pin);\n    }\n\n    return res;\n}\n"
+  },
+  "created_at": "2026-10-17T15:11:59.883490+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"Null Pointer Dereference\",\n  \"file\": \"drivers/ccs811/ccs811.c\",\n  \"message\": \"Either the condition 'dev!=NULL' is redundant or there is possible null pointer dereference: dev.\",\n  \"warning_function_name\": \"ccs811_power_down\",\n  \"warning_line\": \"if (dev->params.wake_pin != GPIO_UNDEF) {\",\n  \"warning_context\": \"int ccs811_power_down (ccs811_t *dev)\\n{\\n    ASSERT_PARAM(dev != NULL);\\n\\n    ccs811_mode_t tmp_mode = dev->params.mode;\\n    int res = ccs811_set_mode(dev, CCS811_MODE_IDLE);\\n    dev->params.mode = tmp_mode;\\n\\n    if (dev->params.wake_pin != GPIO_UNDEF) {\\n        DEBUG_DEV(\\\"Setting nWAKE pin high\\\", dev);\\n        gpio_set(dev->params.wake_pin);\\n    }\\n\\n    return res;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 658,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.82,
+        "probabilities": {
+          "actionable": 0.09,
+          "unactionable": 0.88,
+          "unknown": 0.03
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.82,
+    "probabilities": {
+      "actionable": 0.09,
+      "unactionable": 0.88,
+      "unknown": 0.03
+    }
+  }
+}

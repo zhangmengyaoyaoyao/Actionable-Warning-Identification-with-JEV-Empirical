@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0024_apr.json",
+  "warning": {
+    "Project": "apr",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "tables/apr_tables.c",
+    "message": "Offset: [-47, +oo] (⇐ [0, 47] + [-47, +oo]) Size: [8192, +oo] by call to `apr_table_compress`.",
+    "warning_function_name": "apr_table_overlap",
+    "warning_line": "apr_table_compress(a, flags);",
+    "warning_context": "APR_DECLARE(void) apr_table_overlap(apr_table_t *a, const apr_table_t *b,\n\t\t\t\t    unsigned flags)\n{\n    if (a->a.nelts + b->a.nelts == 0) {\n        return;\n    }\n\n#if APR_POOL_DEBUG\n    /* Since the keys and values are not copied, it's required that\n     * b->a.pool has a lifetime at least as long as a->a.pool. */\n    if (!apr_pool_is_ancestor(b->a.pool, a->a.pool)) {\n        fprintf(stderr, \"apr_table_overlap: b's pool is not an ancestor of a's\\n\");\n        abort();\n    }\n#endif\n\n    apr_table_cat(a, b);\n\n    apr_table_compress(a, flags);\n}\n"
+  },
+  "created_at": "2026-10-17T14:58:39.508072+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"apr\",\n  \"Tool\": \"Infer\",\n  \"category\": \"BUFFER_OVERRUN_L3\",\n  \"file\": \"tables/apr_tables.c\",\n  \"message\": \"Offset: [-47, +oo] (⇐ [0, 47] + [-47, +oo]) Size: [8192, +oo] by call to `apr_table_compress`.\",\n  \"warning_function_name\": \"apr_table_overlap\",\n  \"warning_line\": \"apr_table_compress(a, flags);\",\n  \"warning_context\": \"APR_DECLARE(void) apr_table_overlap(apr_table_t *a, const apr_table_t *b,\\n\\t\\t\\t\\t    unsigned flags)\\n{\\n    if (a->a.nelts + b->a.nelts == 0) {\\n        return;\\n    }\\n\\n#if APR_POOL_DEBUG\\n    /* Since the keys and values are not copied, it's required that\\n     * b->a.pool has a lifetime at least as long as a->a.pool. */\\n    if (!apr_pool_is_ancestor(b->a.pool, a->a.pool)) {\\n        fprintf(stderr, \\\"apr_table_overlap: b's pool is not an ancestor of a's\\\\n\\\");\\n        abort();\\n    }\\n#endif\\n\\n    apr_table_cat(a, b);\\n\\n    apr_table_compress(a, flags);\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 715,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.64,
+        "probabilities": {
+          "actionable": 0.1,
+          "unactionable": 0.76,
+          "unknown": 0.14
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.64,
+    "probabilities": {
+      "actionable": 0.1,
+      "unactionable": 0.76,
+      "unknown": 0.14
+    }
+  }
+}

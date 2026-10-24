@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0033_apr.json",
+  "warning": {
+    "Project": "apr",
+    "Tool": "CSA",
+    "category": "core.NullDereference",
+    "file": "tables/apr_skiplist.c",
+    "message": "Access to field 'compare' results in a dereference of a null pointer (loaded from variable 'sl')",
+    "warning_function_name": "apr_skiplist_set_compare",
+    "warning_line": "if (sl->compare && sl->comparek) {",
+    "warning_context": "APR_DECLARE(void) apr_skiplist_set_compare(apr_skiplist *sl,\n                          apr_skiplist_compare comp,\n                          apr_skiplist_compare compk)\n{\n    if (sl->compare && sl->comparek) {\n        apr_skiplist_add_index(sl, comp, compk);\n    }\n    else {\n        sl->compare = comp;\n        sl->comparek = compk;\n    }\n}\n"
+  },
+  "created_at": "2026-10-17T14:58:42.509037+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"apr\",\n  \"Tool\": \"CSA\",\n  \"category\": \"core.NullDereference\",\n  \"file\": \"tables/apr_skiplist.c\",\n  \"message\": \"Access to field 'compare' results in a dereference of a null pointer (loaded from variable 'sl')\",\n  \"warning_function_name\": \"apr_skiplist_set_compare\",\n  \"warning_line\": \"if (sl->compare && sl->comparek) {\",\n  \"warning_context\": \"APR_DECLARE(void) apr_skiplist_set_compare(apr_skiplist *sl,\\n                          apr_skiplist_compare comp,\\n                          apr_skiplist_compare compk)\\n{\\n    if (sl->compare && sl->comparek) {\\n        apr_skiplist_add_index(sl, comp, compk);\\n    }\\n    else {\\n        sl->compare = comp;\\n        sl->comparek = compk;\\n    }\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 615,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.48,
+        "probabilities": {
+          "actionable": 0.65,
+          "unactionable": 0.29,
+          "unknown": 0.06
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.48,
+    "probabilities": {
+      "actionable": 0.65,
+      "unactionable": 0.29,
+      "unknown": 0.06
+    }
+  }
+}

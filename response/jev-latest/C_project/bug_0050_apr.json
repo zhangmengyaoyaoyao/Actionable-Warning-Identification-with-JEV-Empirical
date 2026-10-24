@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0050_apr.json",
+  "warning": {
+    "Project": "apr",
+    "Tool": "CSA",
+    "category": "core.CallAndMessage",
+    "file": "tables/apr_skiplist.c",
+    "message": "1st function call argument is an uninitialized value",
+    "warning_function_name": "apr_skiplist_add_index",
+    "warning_line": "apr_skiplist_set_compare(ni, comp, compk);",
+    "warning_context": "APR_DECLARE(void) apr_skiplist_add_index(apr_skiplist *sl,\n                        apr_skiplist_compare comp,\n                        apr_skiplist_compare compk)\n{\n    apr_skiplistnode *m;\n    apr_skiplist *ni;\n    int icount = 0;\n    apr_skiplist_find(sl->index, (void *)comp, &m);\n    if (m) {\n        return;                 /* Index already there! */\n    }\n    skiplisti_init(&ni, sl->pool);\n    apr_skiplist_set_compare(ni, comp, compk);\n    /* Build the new index... This can be expensive! */\n    m = apr_skiplist_insert(sl->index, ni);\n    while (m->prev) {\n        m = m->prev;\n        icount++;\n    }\n    for (m = apr_skiplist_getlist(sl); m; apr_skiplist_next(sl, &m)) {\n        int j = icount - 1;\n        apr_skiplistnode *nsln;\n        nsln = apr_skiplist_insert(ni, m->data);\n        /* skip from main index down list */\n        while (j > 0) {\n            m = m->nextindex;\n            j--;\n        }\n        /* insert this node in the indexlist after m */\n        nsln->nextindex = m->nextindex;\n        if (m->nextindex) {\n            m->nextindex->previndex = nsln;\n        }\n        nsln->previndex = m;\n        m->nextindex = nsln;\n    }\n}\n"
+  },
+  "created_at": "2026-10-17T14:58:49.862106+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"apr\",\n  \"Tool\": \"CSA\",\n  \"category\": \"core.CallAndMessage\",\n  \"file\": \"tables/apr_skiplist.c\",\n  \"message\": \"1st function call argument is an uninitialized value\",\n  \"warning_function_name\": \"apr_skiplist_add_index\",\n  \"warning_line\": \"apr_skiplist_set_compare(ni, comp, compk);\",\n  \"warning_context\": \"APR_DECLARE(void) apr_skiplist_add_index(apr_skiplist *sl,\\n                        apr_skiplist_compare comp,\\n                        apr_skiplist_compare compk)\\n{\\n    apr_skiplistnode *m;\\n    apr_skiplist *ni;\\n    int icount = 0;\\n    apr_skiplist_find(sl->index, (void *)comp, &m);\\n    if (m) {\\n        return;                 /* Index already there! */\\n    }\\n    skiplisti_init(&ni, sl->pool);\\n    apr_skiplist_set_compare(ni, comp, compk);\\n    /* Build the new index... This can be expensive! */\\n    m = apr_skiplist_insert(sl->index, ni);\\n    while (m->prev) {\\n        m = m->prev;\\n        icount++;\\n    }\\n    for (m = apr_skiplist_getlist(sl); m; apr_skiplist_next(sl, &m)) {\\n        int j = icount - 1;\\n        apr_skiplistnode *nsln;\\n        nsln = apr_skiplist_insert(ni, m->data);\\n        /* skip from main index down list */\\n        while (j > 0) {\\n            m = m->nextindex;\\n            j--;\\n        }\\n        /* insert this node in the indexlist after m */\\n        nsln->nextindex = m->nextindex;\\n        if (m->nextindex) {\\n            m->nextindex->previndex = nsln;\\n        }\\n        nsln->previndex = m;\\n        m->nextindex = nsln;\\n    }\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 882,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.45,
+        "probabilities": {
+          "actionable": 0.33,
+          "unactionable": 0.63,
+          "unknown": 0.04
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.45,
+    "probabilities": {
+      "actionable": 0.33,
+      "unactionable": 0.63,
+      "unknown": 0.04
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1861_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "sys/quad_math/lshldi3.c",
+    "message": "Either the condition 'shift==0' is redundant or there is possible null pointer dereference: ul.",
+    "warning_function_name": "__lshldi3",
+    "warning_line": "aa.ul[H] = aa.ul[L] << (shift - INT_BITS);",
+    "warning_context": "quad_t __lshldi3(quad_t a, qshift_t shift)\n{\n    union uu aa;\n\n    if (shift == 0) {\n        return a;\n    }\n\n    aa.q = a;\n\n    if (shift >= INT_BITS) {\n        aa.ul[H] = aa.ul[L] << (shift - INT_BITS);\n        aa.ul[L] = 0;\n    }\n    else {\n        aa.ul[H] = (aa.ul[H] << shift) | (aa.ul[L] >> (INT_BITS - shift));\n        aa.ul[L] <<= shift;\n    }\n\n    return aa.q;\n}\n"
+  },
+  "created_at": "2026-10-17T15:12:09.182345+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"Null Pointer Dereference\",\n  \"file\": \"sys/quad_math/lshldi3.c\",\n  \"message\": \"Either the condition 'shift==0' is redundant or there is possible null pointer dereference: ul.\",\n  \"warning_function_name\": \"__lshldi3\",\n  \"warning_line\": \"aa.ul[H] = aa.ul[L] << (shift - INT_BITS);\",\n  \"warning_context\": \"quad_t __lshldi3(quad_t a, qshift_t shift)\\n{\\n    union uu aa;\\n\\n    if (shift == 0) {\\n        return a;\\n    }\\n\\n    aa.q = a;\\n\\n    if (shift >= INT_BITS) {\\n        aa.ul[H] = aa.ul[L] << (shift - INT_BITS);\\n        aa.ul[L] = 0;\\n    }\\n    else {\\n        aa.ul[H] = (aa.ul[H] << shift) | (aa.ul[L] >> (INT_BITS - shift));\\n        aa.ul[L] <<= shift;\\n    }\\n\\n    return aa.q;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 675,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.91,
+        "probabilities": {
+          "actionable": 0.05,
+          "unactionable": 0.94,
+          "unknown": 0.01
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.91,
+    "probabilities": {
+      "actionable": 0.05,
+      "unactionable": 0.94,
+      "unknown": 0.01
+    }
+  }
+}

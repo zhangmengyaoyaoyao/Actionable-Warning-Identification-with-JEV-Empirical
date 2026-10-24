@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0086_bash.json",
+  "warning": {
+    "Project": "bash",
+    "Tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "support/man2html.c",
+    "message": "Uninitialized variable: bd_options",
+    "warning_function_name": "scan_request",
+    "warning_line": "if (strstr(bd_options, \"-offset indent\")) {",
+    "warning_context": "\t\t\t\t\t\t * the same line. */\n\t\t\t\t\tc = scan_troff_mandoc(c, 1, NULL);\n\t\t\t\t}\n\t\t\t\tout_html(change_to_font('R'));\n\t\t\t\tout_html(NEWLINE);\n\t\t\t\tout_html(\"<DD>\");\n\t\t\t} else if (dl_set[itemdepth] & (BL_BULLET_LIST | BL_ENUM_LIST)) {\n\t\t\t\tout_html(\"<LI>\");\n\t\t\t\tc = scan_troff_mandoc(c, 1, NULL);\n\t\t\t\tout_html(NEWLINE);\n\t\t\t}\n\t\t\tif (fillout)\n\t\t\t\tcurpos++;\n\t\t\telse\n\t\t\t\tcurpos = 0;\n\t\t\tbreak;\n\t\tcase V('B', 'k'):\t/* BSD mandoc */\n\t\tcase V('E', 'k'):\t/* BSD mandoc */\n\t\tcase V('D', 'd'):\t/* BSD mandoc */\n\t\tcase V('O', 's'):\t/* BSD mandoc */\n\t\t\ttrans_char(c, '\"', '\\a');\n\t\t\tc = c + j;\n\t\t\tif (*c == '\\n')\n\t\t\t\tc++;\n\t\t\tc = scan_troff_mandoc(c, 1, NULL);\n\t\t\tout_html(NEWLINE);\n\t\t\tif (fillout)\n\t\t\t\tcurpos++;\n\t\t\telse\n\t\t\t\tcurpos = 0;\n\t\t\tbreak;\n\t\tcase V('B', 't'):\t/* BSD mandoc */\n\t\t\ttrans_char(c, '\"', '\\a');\n\t\t\tc = c + j;\n\t\t\tout_html(\" is currently in beta test.\");\n\t\t\tif (fillout)\n\t\t\t\tcurpos++;\n\t\t\telse\n\t\t\t\tcurpos = 0;\n\t\t\tbreak;\n\t\tcase V('B', 'x'):\t/* BSD mandoc */\n\t\t\ttrans_char(c, '\"', '\\a');\n\t\t\tc = c + j;\n\t\t\tif (*c == '\\n')\n\t\t\t\tc++;\n\t\t\tout_html(\"BSD \");\n\t\t\tc = scan_troff_mandoc(c, 1, NULL);\n\t\t\tif (fillout)\n\t\t\t\tcurpos++;\n\t\t\telse\n\t\t\t\tcurpos = 0;\n\t\t\tbreak;\n\t\tcase V('D', 'l'):\t/* BSD mandoc */\n\t\t\tc = c + j;\n\t\t\tout_html(NEWLINE);\n\t\t\tout_html(\"<BLOCKQUOTE>\");\n\t\t\tout_html(change_to_font('L'));\n\t\t\tif (*c == '\\n')\n\t\t\t\tc++;\n\t\t\tc = scan_troff_mandoc(c, 1, NULL);\n\t\t\tout_html(change_to_font('R'));\n\t\t\tout_html(\"</BLOCKQUOTE>\");\n\t\t\tif (fillout)\n\t\t\t\tcurpos++;\n\t\t\telse\n\t\t\t\tcurpos = 0;\n\t\t\tbreak;\n\t\tcase V('B', 'd'):\t/* BSD mandoc */\n\t\t\t{\t/* Seems like a kind of example/literal mode */\n\t\t\t\tchar    bd_options[NULL_TERMINATED(MED_STR_MAX)];\n\t\t\t\tchar   *nl = strchr(c, '\\n');\n\n\t\t\t\tc = c + j;\n\t\t\t\tif (nl) {\n\t\t\t\t\tstrlimitcpy(bd_options, c, nl - c, MED_STR_MAX);\n\t\t\t\t}\n\t\t\t\tout_html(NEWLINE);\n\t\t\t\tmandoc_bd_options = 0;\t/* Remember options for\n\t\t\t\t\t\t\t * terminating Bl */\n\t\t\t\tif (strstr(bd_options, \"-offset indent\")) {\n\t\t\t\t\tmandoc_bd_options |= BD_INDENT;\n\t\t\t\t\tout_html(\"<BLOCKQUOTE>\\n\");\n\t\t\t\t}\n\t\t\t\tif (strstr(bd_options, \"-literal\")\n\t\t\t\t    || strstr(bd_options, \"-unfilled\")) {\n\t\t\t\t\tif (fillout) {\n\t\t\t\t\t\tmandoc_bd_options |= BD_LITERAL;\n\t\t\t\t\t\tout_html(change_to_font(0));\n\t\t\t\t\t\tout_html(change_to_size('0'));\n\t\t\t\t\t\tout_html(\"<PRE>\\n\");\n\t\t\t\t\t}\n\t\t\t\t\tcurpos = 0;\n\t\t\t\t\tfillout = 0;\n\t\t\t\t}\n\t\t\t\tc = skip_till_newline(c);\n\t\t\t\tbreak;\n\t\t\t}\n\t\tcase V('E', 'd'):\t/* BSD mandoc */\n\t\t\tif (mandoc_bd_options & BD_LITERAL) {\n\t\t\t\tif (!fillout) {\n\t\t\t\t\tout_html(change_to_font(0));\n"
+  },
+  "created_at": "2026-10-17T14:59:01.136808+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"bash\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"uninitvar\",\n  \"file\": \"support/man2html.c\",\n  \"message\": \"Uninitialized variable: bd_options\",\n  \"warning_function_name\": \"scan_request\",\n  \"warning_line\": \"if (strstr(bd_options, \\\"-offset indent\\\")) {\",\n  \"warning_context\": \"\\t\\t\\t\\t\\t\\t * the same line. */\\n\\t\\t\\t\\t\\tc = scan_troff_mandoc(c, 1, NULL);\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tout_html(change_to_font('R'));\\n\\t\\t\\t\\tout_html(NEWLINE);\\n\\t\\t\\t\\tout_html(\\\"<DD>\\\");\\n\\t\\t\\t} else if (dl_set[itemdepth] & (BL_BULLET_LIST | BL_ENUM_LIST)) {\\n\\t\\t\\t\\tout_html(\\\"<LI>\\\");\\n\\t\\t\\t\\tc = scan_troff_mandoc(c, 1, NULL);\\n\\t\\t\\t\\tout_html(NEWLINE);\\n\\t\\t\\t}\\n\\t\\t\\tif (fillout)\\n\\t\\t\\t\\tcurpos++;\\n\\t\\t\\telse\\n\\t\\t\\t\\tcurpos = 0;\\n\\t\\t\\tbreak;\\n\\t\\tcase V('B', 'k'):\\t/* BSD mandoc */\\n\\t\\tcase V('E', 'k'):\\t/* BSD mandoc */\\n\\t\\tcase V('D', 'd'):\\t/* BSD mandoc */\\n\\t\\tcase V('O', 's'):\\t/* BSD mandoc */\\n\\t\\t\\ttrans_char(c, '\\\"', '\\\\a');\\n\\t\\t\\tc = c + j;\\n\\t\\t\\tif (*c == '\\\\n')\\n\\t\\t\\t\\tc++;\\n\\t\\t\\tc = scan_troff_mandoc(c, 1, NULL);\\n\\t\\t\\tout_html(NEWLINE);\\n\\t\\t\\tif (fillout)\\n\\t\\t\\t\\tcurpos++;\\n\\t\\t\\telse\\n\\t\\t\\t\\tcurpos = 0;\\n\\t\\t\\tbreak;\\n\\t\\tcase V('B', 't'):\\t/* BSD mandoc */\\n\\t\\t\\ttrans_char(c, '\\\"', '\\\\a');\\n\\t\\t\\tc = c + j;\\n\\t\\t\\tout_html(\\\" is currently in beta test.\\\");\\n\\t\\t\\tif (fillout)\\n\\t\\t\\t\\tcurpos++;\\n\\t\\t\\telse\\n\\t\\t\\t\\tcurpos = 0;\\n\\t\\t\\tbreak;\\n\\t\\tcase V('B', 'x'):\\t/* BSD mandoc */\\n\\t\\t\\ttrans_char(c, '\\\"', '\\\\a');\\n\\t\\t\\tc = c + j;\\n\\t\\t\\tif (*c == '\\\\n')\\n\\t\\t\\t\\tc++;\\n\\t\\t\\tout_html(\\\"BSD \\\");\\n\\t\\t\\tc = scan_troff_mandoc(c, 1, NULL);\\n\\t\\t\\tif (fillout)\\n\\t\\t\\t\\tcurpos++;\\n\\t\\t\\telse\\n\\t\\t\\t\\tcurpos = 0;\\n\\t\\t\\tbreak;\\n\\t\\tcase V('D', 'l'):\\t/* BSD mandoc */\\n\\t\\t\\tc = c + j;\\n\\t\\t\\tout_html(NEWLINE);\\n\\t\\t\\tout_html(\\\"<BLOCKQUOTE>\\\");\\n\\t\\t\\tout_html(change_to_font('L'));\\n\\t\\t\\tif (*c == '\\\\n')\\n\\t\\t\\t\\tc++;\\n\\t\\t\\tc = scan_troff_mandoc(c, 1, NULL);\\n\\t\\t\\tout_html(change_to_font('R'));\\n\\t\\t\\tout_html(\\\"</BLOCKQUOTE>\\\");\\n\\t\\t\\tif (fillout)\\n\\t\\t\\t\\tcurpos++;\\n\\t\\t\\telse\\n\\t\\t\\t\\tcurpos = 0;\\n\\t\\t\\tbreak;\\n\\t\\tcase V('B', 'd'):\\t/* BSD mandoc */\\n\\t\\t\\t{\\t/* Seems like a kind of example/literal mode */\\n\\t\\t\\t\\tchar    bd_options[NULL_TERMINATED(MED_STR_MAX)];\\n\\t\\t\\t\\tchar   *nl = strchr(c, '\\\\n');\\n\\n\\t\\t\\t\\tc = c + j;\\n\\t\\t\\t\\tif (nl) {\\n\\t\\t\\t\\t\\tstrlimitcpy(bd_options, c, nl - c, MED_STR_MAX);\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tout_html(NEWLINE);\\n\\t\\t\\t\\tmandoc_bd_options = 0;\\t/* Remember options for\\n\\t\\t\\t\\t\\t\\t\\t * terminating Bl */\\n\\t\\t\\t\\tif (strstr(bd_options, \\\"-offset indent\\\")) {\\n\\t\\t\\t\\t\\tmandoc_bd_options |= BD_INDENT;\\n\\t\\t\\t\\t\\tout_html(\\\"<BLOCKQUOTE>\\\\n\\\");\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tif (strstr(bd_options, \\\"-literal\\\")\\n\\t\\t\\t\\t    || strstr(bd_options, \\\"-unfilled\\\")) {\\n\\t\\t\\t\\t\\tif (fillout) {\\n\\t\\t\\t\\t\\t\\tmandoc_bd_options |= BD_LITERAL;\\n\\t\\t\\t\\t\\t\\tout_html(change_to_font(0));\\n\\t\\t\\t\\t\\t\\tout_html(change_to_size('0'));\\n\\t\\t\\t\\t\\t\\tout_html(\\\"<PRE>\\\\n\\\");\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\tcurpos = 0;\\n\\t\\t\\t\\t\\tfillout = 0;\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tc = skip_till_newline(c);\\n\\t\\t\\t\\tbreak;\\n\\t\\t\\t}\\n\\t\\tcase V('E', 'd'):\\t/* BSD mandoc */\\n\\t\\t\\tif (mandoc_bd_options & BD_LITERAL) {\\n\\t\\t\\t\\tif (!fillout) {\\n\\t\\t\\t\\t\\tout_html(change_to_font(0));\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 1764,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.8,
+        "probabilities": {
+          "actionable": 0.87,
+          "unactionable": 0.12,
+          "unknown": 0.01
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.8,
+    "probabilities": {
+      "actionable": 0.87,
+      "unactionable": 0.12,
+      "unknown": 0.01
+    }
+  }
+}

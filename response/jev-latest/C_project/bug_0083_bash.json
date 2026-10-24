@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0083_bash.json",
+  "warning": {
+    "Project": "bash",
+    "Tool": "Cppcheck",
+    "category": "memleak",
+    "file": "lib/sh/snprintf.c",
+    "message": "Memory leak: lbuf",
+    "warning_function_name": "wchars",
+    "warning_line": "return;",
+    "warning_context": "static void\nwchars (p, wc)\n     struct DATA *p;\n     wint_t wc;\n{\n  char *lbuf, *l;\n  mbstate_t mbs;\n  size_t len;\n\n  lbuf = (char *)malloc (MB_CUR_MAX+1);\n  if (lbuf == 0)\n    return;\n  memset (&mbs, '\\0', sizeof (mbstate_t));\n  len = wcrtomb (lbuf, wc, &mbs);\n  if (len == (size_t)-1)\n    /* conversion failed; bail now. */\n    return;\n  p->width -= len;\n  l = lbuf;\n  PUT_STRING (l, len, p);\n  free (lbuf);\n}\n"
+  },
+  "created_at": "2026-10-17T14:59:00.396587+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"bash\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"memleak\",\n  \"file\": \"lib/sh/snprintf.c\",\n  \"message\": \"Memory leak: lbuf\",\n  \"warning_function_name\": \"wchars\",\n  \"warning_line\": \"return;\",\n  \"warning_context\": \"static void\\nwchars (p, wc)\\n     struct DATA *p;\\n     wint_t wc;\\n{\\n  char *lbuf, *l;\\n  mbstate_t mbs;\\n  size_t len;\\n\\n  lbuf = (char *)malloc (MB_CUR_MAX+1);\\n  if (lbuf == 0)\\n    return;\\n  memset (&mbs, '\\\\0', sizeof (mbstate_t));\\n  len = wcrtomb (lbuf, wc, &mbs);\\n  if (len == (size_t)-1)\\n    /* conversion failed; bail now. */\\n    return;\\n  p->width -= len;\\n  l = lbuf;\\n  PUT_STRING (l, len, p);\\n  free (lbuf);\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 658,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.95,
+        "probabilities": {
+          "actionable": 0.97,
+          "unactionable": 0.03,
+          "unknown": 0.0
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.95,
+    "probabilities": {
+      "actionable": 0.97,
+      "unactionable": 0.03,
+      "unknown": 0.0
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0052_apr.json",
+  "warning": {
+    "Project": "apr",
+    "Tool": "CSA",
+    "category": "unix.Malloc",
+    "file": "tables/apr_skiplist.c",
+    "message": "Use of memory after it is freed",
+    "warning_function_name": "apr_skiplist_pop",
+    "warning_line": "return data;",
+    "warning_context": "APR_DECLARE(void *) apr_skiplist_pop(apr_skiplist *a, apr_skiplist_freefunc myfree)\n{\n    apr_skiplistnode *sln;\n    void *data = NULL;\n    sln = apr_skiplist_getlist(a);\n    if (sln) {\n        data = sln->data;\n        skiplisti_remove(a, sln, myfree);\n    }\n    return data;\n}\n"
+  },
+  "created_at": "2026-10-17T14:58:50.354742+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"apr\",\n  \"Tool\": \"CSA\",\n  \"category\": \"unix.Malloc\",\n  \"file\": \"tables/apr_skiplist.c\",\n  \"message\": \"Use of memory after it is freed\",\n  \"warning_function_name\": \"apr_skiplist_pop\",\n  \"warning_line\": \"return data;\",\n  \"warning_context\": \"APR_DECLARE(void *) apr_skiplist_pop(apr_skiplist *a, apr_skiplist_freefunc myfree)\\n{\\n    apr_skiplistnode *sln;\\n    void *data = NULL;\\n    sln = apr_skiplist_getlist(a);\\n    if (sln) {\\n        data = sln->data;\\n        skiplisti_remove(a, sln, myfree);\\n    }\\n    return data;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 589,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.43,
+        "probabilities": {
+          "actionable": 0.34,
+          "unactionable": 0.62,
+          "unknown": 0.04
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.43,
+    "probabilities": {
+      "actionable": 0.34,
+      "unactionable": 0.62,
+      "unknown": 0.04
+    }
+  }
+}

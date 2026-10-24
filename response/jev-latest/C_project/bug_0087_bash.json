@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0087_bash.json",
+  "warning": {
+    "Project": "bash",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L1",
+    "file": "lib/sh/tmpfile.c",
+    "message": "Offset: 12 (⇐ 8 + 4) Size: 5 by call to `file_iswdir`.",
+    "warning_function_name": "get_sys_tmpdir",
+    "warning_line": "if (file_iswdir (sys_tmpdir))",
+    "warning_context": "static char *\nget_sys_tmpdir ()\n{\n  if (sys_tmpdir)\n    return sys_tmpdir;\n\n#ifdef P_tmpdir\n  sys_tmpdir = P_tmpdir;\n  if (file_iswdir (sys_tmpdir))\n    return sys_tmpdir;\n#endif\n\n  sys_tmpdir = \"/tmp\";\n  if (file_iswdir (sys_tmpdir))\n    return sys_tmpdir;\n\n  sys_tmpdir = \"/var/tmp\";\n  if (file_iswdir (sys_tmpdir))\n    return sys_tmpdir;\n\n  sys_tmpdir = \"/usr/tmp\";\n  if (file_iswdir (sys_tmpdir))\n    return sys_tmpdir;\n\n  sys_tmpdir = DEFAULT_TMPDIR;\n\n  return sys_tmpdir;\n}\n"
+  },
+  "created_at": "2026-10-17T14:59:01.394030+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"bash\",\n  \"Tool\": \"Infer\",\n  \"category\": \"BUFFER_OVERRUN_L1\",\n  \"file\": \"lib/sh/tmpfile.c\",\n  \"message\": \"Offset: 12 (⇐ 8 + 4) Size: 5 by call to `file_iswdir`.\",\n  \"warning_function_name\": \"get_sys_tmpdir\",\n  \"warning_line\": \"if (file_iswdir (sys_tmpdir))\",\n  \"warning_context\": \"static char *\\nget_sys_tmpdir ()\\n{\\n  if (sys_tmpdir)\\n    return sys_tmpdir;\\n\\n#ifdef P_tmpdir\\n  sys_tmpdir = P_tmpdir;\\n  if (file_iswdir (sys_tmpdir))\\n    return sys_tmpdir;\\n#endif\\n\\n  sys_tmpdir = \\\"/tmp\\\";\\n  if (file_iswdir (sys_tmpdir))\\n    return sys_tmpdir;\\n\\n  sys_tmpdir = \\\"/var/tmp\\\";\\n  if (file_iswdir (sys_tmpdir))\\n    return sys_tmpdir;\\n\\n  sys_tmpdir = \\\"/usr/tmp\\\";\\n  if (file_iswdir (sys_tmpdir))\\n    return sys_tmpdir;\\n\\n  sys_tmpdir = DEFAULT_TMPDIR;\\n\\n  return sys_tmpdir;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 707,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.76,
+        "probabilities": {
+          "actionable": 0.11,
+          "unactionable": 0.84,
+          "unknown": 0.05
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.76,
+    "probabilities": {
+      "actionable": 0.11,
+      "unactionable": 0.84,
+      "unknown": 0.05
+    }
+  }
+}

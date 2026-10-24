@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1844_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "drivers/sht3x/sht3x.c",
+    "message": "Either the condition 'params!=NULL' is redundant or there is possible null pointer dereference: params.",
+    "warning_function_name": "sht3x_init",
+    "warning_line": "dev->mode     = params->mode;",
+    "warning_context": "int sht3x_init (sht3x_dev_t *dev, const sht3x_params_t *params)\n{\n    ASSERT_PARAM(dev != NULL);\n    ASSERT_PARAM(params != NULL);\n\n    int res = SHT3X_OK;\n\n    /* inititalize sensor data structure */\n    dev->i2c_dev  = params->i2c_dev;\n    dev->i2c_addr = params->i2c_addr;\n    dev->mode     = params->mode;\n    dev->repeat   = params->repeat;\n\n    dev->meas_start_time = 0;\n    dev->meas_duration = 0;\n    dev->meas_started = false;\n\n    /* try to reset the sensor */\n    if ((res = _reset(dev)) != SHT3X_OK) {\n        return res;\n    }\n\n    DEBUG_DEV(\"sensor initialized\", dev);\n\n    /* start periodic measurements */\n    if ((dev->mode != SHT3X_SINGLE_SHOT) &&\n        (res = _start_measurement (dev)) != SHT3X_OK){\n        return res;\n    }\n\n    return res;\n}\n"
+  },
+  "created_at": "2026-10-17T15:12:02.414235+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"Null Pointer Dereference\",\n  \"file\": \"drivers/sht3x/sht3x.c\",\n  \"message\": \"Either the condition 'params!=NULL' is redundant or there is possible null pointer dereference: params.\",\n  \"warning_function_name\": \"sht3x_init\",\n  \"warning_line\": \"dev->mode     = params->mode;\",\n  \"warning_context\": \"int sht3x_init (sht3x_dev_t *dev, const sht3x_params_t *params)\\n{\\n    ASSERT_PARAM(dev != NULL);\\n    ASSERT_PARAM(params != NULL);\\n\\n    int res = SHT3X_OK;\\n\\n    /* inititalize sensor data structure */\\n    dev->i2c_dev  = params->i2c_dev;\\n    dev->i2c_addr = params->i2c_addr;\\n    dev->mode     = params->mode;\\n    dev->repeat   = params->repeat;\\n\\n    dev->meas_start_time = 0;\\n    dev->meas_duration = 0;\\n    dev->meas_started = false;\\n\\n    /* try to reset the sensor */\\n    if ((res = _reset(dev)) != SHT3X_OK) {\\n        return res;\\n    }\\n\\n    DEBUG_DEV(\\\"sensor initialized\\\", dev);\\n\\n    /* start periodic measurements */\\n    if ((dev->mode != SHT3X_SINGLE_SHOT) &&\\n        (res = _start_measurement (dev)) != SHT3X_OK){\\n        return res;\\n    }\\n\\n    return res;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 784,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.88,
+        "probabilities": {
+          "actionable": 0.07,
+          "unactionable": 0.92,
+          "unknown": 0.01
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.88,
+    "probabilities": {
+      "actionable": 0.07,
+      "unactionable": 0.92,
+      "unknown": 0.01
+    }
+  }
+}

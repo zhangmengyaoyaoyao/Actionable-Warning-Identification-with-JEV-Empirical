@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1898_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Infer",
+    "category": "Buffer Overrun L2",
+    "file": "sys/hashes/sha1.c",
+    "message": "Offset: [0, 19] Size: 5.",
+    "warning_function_name": "ha1_final_hmac(",
+    "warning_line": "sha1_update_byte(ctx, ctx->inner_hash[i]);",
+    "warning_context": "void sha1_final_hmac(sha1_context *ctx, void *digest)\n{\n    uint8_t i;\n\n    /* Complete inner hash */\n    sha1_final(ctx, ctx->inner_hash);\n    /* Calculate outer hash */\n    sha1_init(ctx);\n    for (i = 0; i < SHA1_BLOCK_LENGTH; i++) {\n        sha1_update_byte(ctx, ctx->key_buffer[i] ^ HMAC_OPAD);\n    }\n    for (i = 0; i < SHA1_DIGEST_LENGTH; i++) {\n        sha1_update_byte(ctx, ctx->inner_hash[i]);\n    }\n\n    sha1_final(ctx, digest);\n}\n"
+  },
+  "created_at": "2026-10-17T15:12:26.448620+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Infer\",\n  \"category\": \"Buffer Overrun L2\",\n  \"file\": \"sys/hashes/sha1.c\",\n  \"message\": \"Offset: [0, 19] Size: 5.\",\n  \"warning_function_name\": \"ha1_final_hmac(\",\n  \"warning_line\": \"sha1_update_byte(ctx, ctx->inner_hash[i]);\",\n  \"warning_context\": \"void sha1_final_hmac(sha1_context *ctx, void *digest)\\n{\\n    uint8_t i;\\n\\n    /* Complete inner hash */\\n    sha1_final(ctx, ctx->inner_hash);\\n    /* Calculate outer hash */\\n    sha1_init(ctx);\\n    for (i = 0; i < SHA1_BLOCK_LENGTH; i++) {\\n        sha1_update_byte(ctx, ctx->key_buffer[i] ^ HMAC_OPAD);\\n    }\\n    for (i = 0; i < SHA1_DIGEST_LENGTH; i++) {\\n        sha1_update_byte(ctx, ctx->inner_hash[i]);\\n    }\\n\\n    sha1_final(ctx, digest);\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 664,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.52,
+        "probabilities": {
+          "actionable": 0.26,
+          "unactionable": 0.68,
+          "unknown": 0.06
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.52,
+    "probabilities": {
+      "actionable": 0.26,
+      "unactionable": 0.68,
+      "unknown": 0.06
+    }
+  }
+}

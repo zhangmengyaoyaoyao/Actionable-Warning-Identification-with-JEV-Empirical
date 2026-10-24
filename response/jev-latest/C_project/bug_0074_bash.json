@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0074_bash.json",
+  "warning": {
+    "Project": "bash",
+    "Tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "lib/malloc/stats.c",
+    "message": "Uninitialized variable: v.ncoalesce",
+    "warning_function_name": "malloc_bucket_stats",
+    "warning_line": "return v;",
+    "warning_context": "struct bucket_stats\nmalloc_bucket_stats (size)\n     int size;\n{\n  struct bucket_stats v;\n\n  v.nfree = 0;\n\n  if (size < 0 || size >= NBUCKETS)\n    {\n      v.blocksize = 0;\n      v.nused = v.nmal = v.nmorecore = v.nlesscore = v.nsplit = 0;\n      return v;\n    }\n\n  v.blocksize = 1 << (size + 3);\n  v.nused = _mstats.nmalloc[size];\n  v.nmal = _mstats.tmalloc[size];\n  v.nmorecore = _mstats.nmorecore[size];\n  v.nlesscore = _mstats.nlesscore[size];\n  v.nsplit = _mstats.nsplit[size];\n  v.ncoalesce = _mstats.ncoalesce[size];\n\n  v.nfree = malloc_free_blocks (size);\t/* call back to malloc.c */\n\n  return v;\n}\n"
+  },
+  "created_at": "2026-10-17T14:58:56.934796+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"bash\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"uninitvar\",\n  \"file\": \"lib/malloc/stats.c\",\n  \"message\": \"Uninitialized variable: v.ncoalesce\",\n  \"warning_function_name\": \"malloc_bucket_stats\",\n  \"warning_line\": \"return v;\",\n  \"warning_context\": \"struct bucket_stats\\nmalloc_bucket_stats (size)\\n     int size;\\n{\\n  struct bucket_stats v;\\n\\n  v.nfree = 0;\\n\\n  if (size < 0 || size >= NBUCKETS)\\n    {\\n      v.blocksize = 0;\\n      v.nused = v.nmal = v.nmorecore = v.nlesscore = v.nsplit = 0;\\n      return v;\\n    }\\n\\n  v.blocksize = 1 << (size + 3);\\n  v.nused = _mstats.nmalloc[size];\\n  v.nmal = _mstats.tmalloc[size];\\n  v.nmorecore = _mstats.nmorecore[size];\\n  v.nlesscore = _mstats.nlesscore[size];\\n  v.nsplit = _mstats.nsplit[size];\\n  v.ncoalesce = _mstats.ncoalesce[size];\\n\\n  v.nfree = malloc_free_blocks (size);\\t/* call back to malloc.c */\\n\\n  return v;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 733,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.64,
+        "probabilities": {
+          "actionable": 0.22,
+          "unactionable": 0.76,
+          "unknown": 0.02
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.64,
+    "probabilities": {
+      "actionable": 0.22,
+      "unactionable": 0.76,
+      "unknown": 0.02
+    }
+  }
+}

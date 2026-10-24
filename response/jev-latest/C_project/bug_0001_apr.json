@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0001_apr.json",
+  "warning": {
+    "Project": "apr",
+    "Tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "network_io/unix/inet_pton.c",
+    "message": " variable: tmp",
+    "warning_function_name": "inet_pton4",
+    "warning_line": "memcpy(dst, tmp, INADDRSZ);",
+    "warning_context": "static int\ninet_pton4(const char *src, unsigned char *dst)\n{\n    static const char digits[] = \"0123456789\";\n    int saw_digit, octets, ch;\n    unsigned char tmp[INADDRSZ], *tp;\n\n    saw_digit = 0;\n    octets = 0;\n    *(tp = tmp) = 0;\n    while ((ch = *src++) != '\\0') {\n\tconst char *pch;\n\n\tif ((pch = strchr(digits, ch)) != NULL) {\n\t    unsigned int new = *tp * 10 + (unsigned int)(pch - digits);\n\n\t    if (new > 255)\n\t\treturn (0);\n\t    *tp = new;\n\t    if (! saw_digit) {\n\t\tif (++octets > 4)\n\t\t    return (0);\n\t\tsaw_digit = 1;\n\t    }\n\t} else if (ch == '.' && saw_digit) {\n\t    if (octets == 4)\n\t\treturn (0);\n\t    *++tp = 0;\n\t    saw_digit = 0;\n\t} else\n\t\treturn (0);\n    }\n    if (octets < 4)\n\treturn (0);\n\n    memcpy(dst, tmp, INADDRSZ);\n    return (1);\n}\n"
+  },
+  "created_at": "2026-10-17T14:58:31.065627+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"apr\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"uninitvar\",\n  \"file\": \"network_io/unix/inet_pton.c\",\n  \"message\": \" variable: tmp\",\n  \"warning_function_name\": \"inet_pton4\",\n  \"warning_line\": \"memcpy(dst, tmp, INADDRSZ);\",\n  \"warning_context\": \"static int\\ninet_pton4(const char *src, unsigned char *dst)\\n{\\n    static const char digits[] = \\\"0123456789\\\";\\n    int saw_digit, octets, ch;\\n    unsigned char tmp[INADDRSZ], *tp;\\n\\n    saw_digit = 0;\\n    octets = 0;\\n    *(tp = tmp) = 0;\\n    while ((ch = *src++) != '\\\\0') {\\n\\tconst char *pch;\\n\\n\\tif ((pch = strchr(digits, ch)) != NULL) {\\n\\t    unsigned int new = *tp * 10 + (unsigned int)(pch - digits);\\n\\n\\t    if (new > 255)\\n\\t\\treturn (0);\\n\\t    *tp = new;\\n\\t    if (! saw_digit) {\\n\\t\\tif (++octets > 4)\\n\\t\\t    return (0);\\n\\t\\tsaw_digit = 1;\\n\\t    }\\n\\t} else if (ch == '.' && saw_digit) {\\n\\t    if (octets == 4)\\n\\t\\treturn (0);\\n\\t    *++tp = 0;\\n\\t    saw_digit = 0;\\n\\t} else\\n\\t\\treturn (0);\\n    }\\n    if (octets < 4)\\n\\treturn (0);\\n\\n    memcpy(dst, tmp, INADDRSZ);\\n    return (1);\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 822,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.79,
+        "probabilities": {
+          "actionable": 0.13,
+          "unactionable": 0.86,
+          "unknown": 0.01
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.79,
+    "probabilities": {
+      "actionable": 0.13,
+      "unactionable": 0.86,
+      "unknown": 0.01
+    }
+  }
+}

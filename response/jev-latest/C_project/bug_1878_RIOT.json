@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1878_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Cppcheck",
+    "category": "ctuArrayIndex",
+    "file": "sys/net/application_layer/emcute/emcute.c",
+    "message": "Array index out of bounds; buffer 'buf' is accessed at offset 0.",
+    "warning_function_name": "et_len(",
+    "warning_line": "if (buf[0] != 0x01) {",
+    "warning_context": "static size_t get_len(uint8_t *buf, uint16_t *len)\n{\n    if (buf[0] != 0x01) {\n        *len = (uint16_t)buf[0];\n        return 1;\n    }\n    else {\n        *len = byteorder_bebuftohs(&buf[1]);\n        return 3;\n    }\n}\n"
+  },
+  "created_at": "2026-10-17T15:12:15.045635+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"ctuArrayIndex\",\n  \"file\": \"sys/net/application_layer/emcute/emcute.c\",\n  \"message\": \"Array index out of bounds; buffer 'buf' is accessed at offset 0.\",\n  \"warning_function_name\": \"et_len(\",\n  \"warning_line\": \"if (buf[0] != 0x01) {\",\n  \"warning_context\": \"static size_t get_len(uint8_t *buf, uint16_t *len)\\n{\\n    if (buf[0] != 0x01) {\\n        *len = (uint16_t)buf[0];\\n        return 1;\\n    }\\n    else {\\n        *len = byteorder_bebuftohs(&buf[1]);\\n        return 3;\\n    }\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 611,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.22,
+        "probabilities": {
+          "actionable": 0.48,
+          "unactionable": 0.36,
+          "unknown": 0.16
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.22,
+    "probabilities": {
+      "actionable": 0.48,
+      "unactionable": 0.36,
+      "unknown": 0.16
+    }
+  }
+}

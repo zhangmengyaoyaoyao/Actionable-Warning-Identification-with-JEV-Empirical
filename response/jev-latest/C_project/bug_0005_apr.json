@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_0005_apr.json",
+  "warning": {
+    "Project": "apr",
+    "Tool": "Cppcheck",
+    "category": "memleak",
+    "file": "build/jlibtool.c",
+    "message": "Memory leak: path",
+    "warning_function_name": "load_install_path",
+    "warning_line": "return NULL;",
+    "warning_context": "char * load_install_path(const char *arg)\n{\n    FILE *f;\n    char *path;\n\n    path = malloc(PATH_MAX);\n\n    f = fopen(arg,\"r\");\n    if (f == NULL) {\n        return NULL;\n    }\n    fgets(path, PATH_MAX, f);\n    fclose(f);\n    if (path[strlen(path)-1] == '\\n') {\n        path[strlen(path)-1] = '\\0';\n    }\n    /* Check that we have an absolute path.\n     * Otherwise the file could be a GNU libtool file.\n     */\n    if (path[0] != '/') {\n        return NULL;\n    }\n    return path;\n}\n"
+  },
+  "created_at": "2026-10-17T14:58:32.516018+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"apr\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"memleak\",\n  \"file\": \"build/jlibtool.c\",\n  \"message\": \"Memory leak: path\",\n  \"warning_function_name\": \"load_install_path\",\n  \"warning_line\": \"return NULL;\",\n  \"warning_context\": \"char * load_install_path(const char *arg)\\n{\\n    FILE *f;\\n    char *path;\\n\\n    path = malloc(PATH_MAX);\\n\\n    f = fopen(arg,\\\"r\\\");\\n    if (f == NULL) {\\n        return NULL;\\n    }\\n    fgets(path, PATH_MAX, f);\\n    fclose(f);\\n    if (path[strlen(path)-1] == '\\\\n') {\\n        path[strlen(path)-1] = '\\\\0';\\n    }\\n    /* Check that we have an absolute path.\\n     * Otherwise the file could be a GNU libtool file.\\n     */\\n    if (path[0] != '/') {\\n        return NULL;\\n    }\\n    return path;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 650,
+      "output_tokens": 48
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "actionable",
+        "confidence": 0.91,
+        "probabilities": {
+          "actionable": 0.94,
+          "unactionable": 0.05,
+          "unknown": 0.01
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "actionable",
+    "confidence": 0.91,
+    "probabilities": {
+      "actionable": 0.94,
+      "unactionable": 0.05,
+      "unknown": 0.01
+    }
+  }
+}

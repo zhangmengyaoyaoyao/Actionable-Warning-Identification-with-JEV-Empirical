@@ -1,0 +1,59 @@
+{
+  "source_file": "report/c_json/bug_1834_RIOT.json",
+  "warning": {
+    "Project": "RIOT",
+    "Tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "drivers/ccs811/ccs811.c",
+    "message": "Either the condition 'dev!=NULL' is redundant or there is possible null pointer dereference: dev.",
+    "warning_function_name": "ccs811_read_iaq",
+    "warning_line": "if (dev->params.mode == CCS811_MODE_IDLE) {",
+    "warning_context": "int ccs811_read_iaq(const ccs811_t *dev,\n                    uint16_t *iaq_tvoc, uint16_t *iaq_eco2,\n                    uint16_t *raw_i, uint16_t *raw_v)\n{\n    ASSERT_PARAM(dev != NULL);\n\n    int res = CCS811_OK;\n\n    if (dev->params.mode == CCS811_MODE_IDLE) {\n        DEBUG_DEV(\"sensor is in idle mode and not performing \"\n                  \"measurements\", dev);\n        return -CCS811_ERROR_MEASMODE_INV;\n    }\n\n    if (dev->params.mode == CCS811_MODE_250MS && (iaq_tvoc || iaq_eco2)) {\n        DEBUG_DEV(\"sensor is in constant power mode, only raw data \"\n                  \"are available every 250ms\", dev);\n        return -CCS811_ERROR_NO_IAQ_DATA;\n    }\n\n    uint8_t data[8];\n\n    /* read IAQ sensor values and RAW sensor data including status and error id */\n    if (_reg_read(dev, CCS811_REG_ALG_RESULT_DATA, data, 8) != CCS811_OK) {\n        DEBUG_DEV(\"could not read sensor data from \"\n                  \"register CCS811_REG_ALG_RESULT_DATA\", dev);\n        return -CCS811_ERROR_I2C;\n    }\n\n    /* check for errors */\n    if (data[CCS811_ALG_DATA_STATUS] & CCS811_STATUS_ERROR) {\n        return _error_code(dev, data[CCS811_ALG_DATA_ERROR_ID]);\n    }\n\n    /*\n     * check whether new data are ready to read; if not, latest values read\n     * from sensor are used and error code CCS811_ERROR_NO_NEW_DATA is returned\n     */\n    if (!(data[CCS811_ALG_DATA_STATUS] & CCS811_STATUS_DATA_RDY)) {\n        DEBUG_DEV(\"no new data\", dev);\n        res = -CCS811_ERROR_NO_NEW_DATA;\n    }\n\n    /* if *iaq* is not NULL return IAQ sensor values */\n    if (iaq_tvoc) {\n        *iaq_tvoc  = data[CCS811_ALG_DATA_TVOC_HB] << 8;\n        *iaq_tvoc |= data[CCS811_ALG_DATA_TVOC_LB];\n    }\n    if (iaq_eco2) {\n        *iaq_eco2  = data[CCS811_ALG_DATA_ECO2_HB] << 8;\n        *iaq_eco2 |= data[CCS811_ALG_DATA_ECO2_LB];\n    }\n\n    /* if *raw* is not NULL return RAW sensor data */\n    if (raw_i) {\n        *raw_i = data[CCS811_ALG_DATA_RAW_HB] >> 2;\n    }\n    if (raw_v) {\n        *raw_v  = (data[CCS811_ALG_DATA_RAW_HB] & 0x03) << 8;\n        *raw_v |= data[CCS811_ALG_DATA_RAW_LB];\n    }\n\n    return res;\n}\n"
+  },
+  "created_at": "2026-10-17T15:11:58.781829+00:00",
+  "request": {
+    "model": "jev-latest",
+    "question_id": "actionability",
+    "state": "{\n  \"Project\": \"RIOT\",\n  \"Tool\": \"Cppcheck\",\n  \"category\": \"Null Pointer Dereference\",\n  \"file\": \"drivers/ccs811/ccs811.c\",\n  \"message\": \"Either the condition 'dev!=NULL' is redundant or there is possible null pointer dereference: dev.\",\n  \"warning_function_name\": \"ccs811_read_iaq\",\n  \"warning_line\": \"if (dev->params.mode == CCS811_MODE_IDLE) {\",\n  \"warning_context\": \"int ccs811_read_iaq(const ccs811_t *dev,\\n                    uint16_t *iaq_tvoc, uint16_t *iaq_eco2,\\n                    uint16_t *raw_i, uint16_t *raw_v)\\n{\\n    ASSERT_PARAM(dev != NULL);\\n\\n    int res = CCS811_OK;\\n\\n    if (dev->params.mode == CCS811_MODE_IDLE) {\\n        DEBUG_DEV(\\\"sensor is in idle mode and not performing \\\"\\n                  \\\"measurements\\\", dev);\\n        return -CCS811_ERROR_MEASMODE_INV;\\n    }\\n\\n    if (dev->params.mode == CCS811_MODE_250MS && (iaq_tvoc || iaq_eco2)) {\\n        DEBUG_DEV(\\\"sensor is in constant power mode, only raw data \\\"\\n                  \\\"are available every 250ms\\\", dev);\\n        return -CCS811_ERROR_NO_IAQ_DATA;\\n    }\\n\\n    uint8_t data[8];\\n\\n    /* read IAQ sensor values and RAW sensor data including status and error id */\\n    if (_reg_read(dev, CCS811_REG_ALG_RESULT_DATA, data, 8) != CCS811_OK) {\\n        DEBUG_DEV(\\\"could not read sensor data from \\\"\\n                  \\\"register CCS811_REG_ALG_RESULT_DATA\\\", dev);\\n        return -CCS811_ERROR_I2C;\\n    }\\n\\n    /* check for errors */\\n    if (data[CCS811_ALG_DATA_STATUS] & CCS811_STATUS_ERROR) {\\n        return _error_code(dev, data[CCS811_ALG_DATA_ERROR_ID]);\\n    }\\n\\n    /*\\n     * check whether new data are ready to read; if not, latest values read\\n     * from sensor are used and error code CCS811_ERROR_NO_NEW_DATA is returned\\n     */\\n    if (!(data[CCS811_ALG_DATA_STATUS] & CCS811_STATUS_DATA_RDY)) {\\n        DEBUG_DEV(\\\"no new data\\\", dev);\\n        res = -CCS811_ERROR_NO_NEW_DATA;\\n    }\\n\\n    /* if *iaq* is not NULL return IAQ sensor values */\\n    if (iaq_tvoc) {\\n        *iaq_tvoc  = data[CCS811_ALG_DATA_TVOC_HB] << 8;\\n        *iaq_tvoc |= data[CCS811_ALG_DATA_TVOC_LB];\\n    }\\n    if (iaq_eco2) {\\n        *iaq_eco2  = data[CCS811_ALG_DATA_ECO2_HB] << 8;\\n        *iaq_eco2 |= data[CCS811_ALG_DATA_ECO2_LB];\\n    }\\n\\n    /* if *raw* is not NULL return RAW sensor data */\\n    if (raw_i) {\\n        *raw_i = data[CCS811_ALG_DATA_RAW_HB] >> 2;\\n    }\\n    if (raw_v) {\\n        *raw_v  = (data[CCS811_ALG_DATA_RAW_HB] & 0x03) << 8;\\n        *raw_v |= data[CCS811_ALG_DATA_RAW_LB];\\n    }\\n\\n    return res;\\n}\\n\"\n}",
+    "questions": {
+      "actionability": {
+        "type": "choice",
+        "instructions": "Decide whether this static-analysis warning is actionable. Actionable means a real issue that developers should fix; unactionable means a false positive or noise that does not need a fix; unknown means there is not enough evidence to decide.",
+        "criteria": {
+          "actionable": "A genuine defect or risk that warrants developer attention and a code change.",
+          "unactionable": "A false positive, intentional pattern, or warning that does not require a fix.",
+          "unknown": "Insufficient context or conflicting signals; cannot confidently classify."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 1296,
+      "output_tokens": 49
+    },
+    "answers": {
+      "actionability": {
+        "type": "choice",
+        "choice": "unactionable",
+        "confidence": 0.82,
+        "probabilities": {
+          "actionable": 0.1,
+          "unactionable": 0.88,
+          "unknown": 0.02
+        }
+      }
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "choice": "unactionable",
+    "confidence": 0.82,
+    "probabilities": {
+      "actionable": 0.1,
+      "unactionable": 0.88,
+      "unknown": 0.02
+    }
+  }
+}
