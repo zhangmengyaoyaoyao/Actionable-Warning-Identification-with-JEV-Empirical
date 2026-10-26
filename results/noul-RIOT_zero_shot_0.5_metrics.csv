@@ -1,0 +1,6 @@
+Model,Prompts Technique,TP,TN,FP,FN,Precision,Recall,F1 Score,Total,Unknown,Project,Language,Lower Threshold,Upper Threshold,Accuracy,Unknown Rate
+Jev,zero_shot,1,60,18,2,0.0526,0.3333,0.0909,81,0,RIOT,c,0.5,0.5,0.7531,0
+DeepSeek-R1,zero_shot,1,26,52,2,0.0189,0.3333,0.0357,81,0,RIOT,c,,,0.3333,0
+glm-4-flash,zero_shot,1,6,72,2,0.0137,0.3333,0.0263,81,5,RIOT,c,,,0.0864,0.0617
+gpt-3.5-turbo-0125,zero_shot,3,5,73,0,0.0395,1,0.0759,81,0,RIOT,c,,,0.0988,0
+llama3.1-70b-instruct,zero_shot,2,13,65,1,0.0299,0.6667,0.0571,81,0,RIOT,c,,,0.1852,0

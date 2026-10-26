@@ -11,10 +11,9 @@ report/spotbugs/
 report/spotbugs_linked/
 
 # LLM experiment outputs (do not upload)
-results/
-*.xlsx
-*.xls
-*.csv
+results/c/
+results/java/
+results/jev/
 
 # Ignore all response/* by default (LLM providers, etc.)
 response/*
